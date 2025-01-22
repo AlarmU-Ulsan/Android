@@ -13,7 +13,7 @@ class NoticeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
 
-        initRV()
+//        initRV()
 
         setContentView(binding.root)
     }
