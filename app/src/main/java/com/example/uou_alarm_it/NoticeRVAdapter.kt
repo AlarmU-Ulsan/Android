@@ -26,6 +26,20 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
         Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 377, "2025-01-03"),
     )
 
+    var bookmarkList : ArrayList<Notice> = arrayListOf()
+
+    interface MyClickListener{
+        fun onItemClick(notice: Notice)
+        fun onBookmarkClick(notice: Notice)
+    }
+
+    private lateinit var myClickListener: MyClickListener
+
+    fun setMyClickListener(itemClickListener:MyClickListener){
+        myClickListener = itemClickListener
+    }
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemNoticeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
@@ -36,6 +50,9 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(noticeList[position])
+        holder.itemView.setOnClickListener {
+            myClickListener.onItemClick(noticeList[position])
+        }
     }
 
     inner class ViewHolder(private val binding: ItemNoticeBinding) : RecyclerView.ViewHolder(binding.root){
@@ -53,6 +70,17 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
                 binding.itemNotice.setBackgroundColor(
                     ContextCompat.getColor(binding.root.context, R.color.transparent)
                 )
+            }
+
+            if(notice in bookmarkList) {
+                binding.itemNoticeBookmark.setImageResource(R.drawable.bookmark_on)
+            }
+            else{
+                binding.itemNoticeBookmark.setImageResource(R.drawable.bookmark_off)
+            }
+
+            binding.itemNoticeBookmark.setOnClickListener {
+                myClickListener.onBookmarkClick(notice)
             }
         }
     }
