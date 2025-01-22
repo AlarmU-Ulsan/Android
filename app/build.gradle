@@ -7,6 +7,10 @@ android {
     namespace 'com.example.uou_alarm_it'
     compileSdk 34
 
+    viewBinding {
+        enabled = true
+    }
+
     defaultConfig {
         applicationId "com.example.uou_alarm_it"
         minSdk 29
