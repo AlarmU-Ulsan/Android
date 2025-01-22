@@ -51,6 +51,7 @@
         android:text="★재학생(편입, 복전) 필독★ 졸업작품 이수 관련 안내"
         android:textColor="@color/black"
         android:textSize="12dp"
+        android:textStyle="bold"
         android:layout_marginTop="15dp"
         android:layout_marginStart="24.29dp"
         app:layout_constraintTop_toBottomOf="@id/item_notice_number"
