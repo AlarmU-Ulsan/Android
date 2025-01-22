@@ -39,7 +39,6 @@ class NoticeActivity : AppCompatActivity() {
                 binding.noticeTabLayout.visibility = View.GONE
             }
             else {
-                binding.noticeTabLayout.visibility = View.VISIBLE
                 noticeSearch()
             }
         }
