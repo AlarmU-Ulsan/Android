@@ -45,7 +45,7 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
             if(notice.isImportant) {
                 binding.itemNoticeNumber.text = "공지"
                 binding.itemNotice.setBackgroundColor(
-                    ContextCompat.getColor(NoticeActivity(), R.color.green_20)
+                    ContextCompat.getColor(binding.root.context, R.color.green_20)
                 )
             }
             else {
