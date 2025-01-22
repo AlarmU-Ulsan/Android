@@ -18,24 +18,7 @@ class NoticeActivity : AppCompatActivity() {
 
     companion object {
         var position : Int = 0
-        var noticeList : ArrayList<Notice> = arrayListOf(
-            Notice(true, "★재학생(편입, 복전) 필독★ 졸업작품 이수 관련 안내", 9, "2024-09-05"),
-            Notice(true, "2024-2학기 빛냄장학 신청 안내", 10, "2024-09-05"),
-            Notice(true, "2024-2학기 역량개발장학 신청 안내", 11, "2024-09-05"),
-            Notice(false, "개인단위 수준별 영어교육 시행에 따른 기초학력...", 388, "2025-01-06"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 387, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 386, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 385, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 384, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 383, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 382, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 381, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 380, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 379, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 378, "2025-01-03"),
-            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 377, "2025-01-03"),
-        )
-
+        var noticeList : ArrayList<Notice> = arrayListOf()
         var bookmarkList : HashSet<Int> = hashSetOf()
     }
 
@@ -74,14 +57,35 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
         binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
 
+        noticeList = arrayListOf(
+            Notice(true, "★재학생(편입, 복전) 필독★ 졸업작품 이수 관련 안내", 9, "2024-09-05"),
+            Notice(true, "2024-2학기 빛냄장학 신청 안내", 10, "2024-09-05"),
+            Notice(true, "2024-2학기 역량개발장학 신청 안내", 11, "2024-09-05"),
+            Notice(false, "개인단위 수준별 영어교육 시행에 따른 기초학력...", 388, "2025-01-06"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 387, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 386, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 385, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 384, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 383, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 382, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 381, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 380, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 379, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 378, "2025-01-03"),
+            Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 377, "2025-01-03")
+        )
+
+
         when (position) {
             1 -> {
                 NoticeActivity.position = 1
                 binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
+                noticeList = noticeList.filter { it.isImportant == true }.toCollection(ArrayList())
             }
             2 -> {
                 NoticeActivity.position = 2
                 binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
+                noticeList = noticeList.filter { it.number in bookmarkList }.toCollection(ArrayList())
             }
             else -> {
                 NoticeActivity.position = 0
