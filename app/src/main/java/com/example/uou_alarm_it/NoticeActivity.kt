@@ -1,8 +1,11 @@
 package com.example.uou_alarm_it
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 
@@ -30,8 +33,31 @@ class NoticeActivity : AppCompatActivity() {
             position = 2
             setposition(position)
         }
+        binding.noticeSearchIv.setOnClickListener{
+            if(binding.noticeSearchEt.visibility == View.GONE) {
+                binding.noticeSearchEt.visibility = View.VISIBLE
+                binding.noticeTabLayout.visibility = View.GONE
+            }
+            else {
+                noticeSearch()
+            }
+        }
 
         setContentView(binding.root)
+    }
+
+    private fun noticeSearch() {
+        Log.d("Notice Search", binding.noticeSearchEt.text.toString())
+    }
+
+    override fun onBackPressed() {
+        if (binding.noticeSearchEt.visibility == View.VISIBLE) {
+            binding.noticeSearchEt.visibility = View.GONE
+            binding.noticeTabLayout.visibility = View.VISIBLE
+        }
+        else {
+            super.onBackPressed()
+        }
     }
 
     private fun setposition(position:Int){
