@@ -50,6 +50,9 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
             }
             else {
                 binding.itemNoticeNumber.text = notice.number.toString()
+                binding.itemNotice.setBackgroundColor(
+                    ContextCompat.getColor(binding.root.context, R.color.transparent)
+                )
             }
         }
     }
