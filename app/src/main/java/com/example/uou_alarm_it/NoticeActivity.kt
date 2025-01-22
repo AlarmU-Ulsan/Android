@@ -22,16 +22,13 @@ class NoticeActivity : AppCompatActivity() {
         setposition(position)
 
         binding.noticeTabAll.setOnClickListener{
-            position = 0
-            setposition(position)
+            setposition(0)
         }
         binding.noticeTabImportant.setOnClickListener {
-            position = 1
-            setposition(position)
+            setposition(1)
         }
         binding.noticeTabBookmark.setOnClickListener {
-            position = 2
-            setposition(position)
+            setposition(2)
         }
         binding.noticeSearchIv.setOnClickListener{
             if(binding.noticeSearchEt.visibility == View.GONE) {
@@ -46,6 +43,41 @@ class NoticeActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
+    private fun setposition(position:Int){
+        binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+        binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+        binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+        binding.noticeRv.adapter = noticeRVAdapter
+
+        when (position) {
+            1 -> {
+                this.position = 1
+                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
+            }
+            2 -> {
+                this.position = 2
+                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
+            }
+            else -> {
+                this.position = 0
+                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
+            }
+        }
+
+        noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener{
+            override fun onItemClick(notice: Notice) {
+                Log.d("test", "Item")
+            }
+
+            override fun onBookmarkClick(notice: Notice) {
+                Log.d("test", "Bookmark")
+                noticeRVAdapter.bookmarkList.add(notice)
+            }
+
+        })
+        binding.noticeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+    }
+
     private fun noticeSearch() {
         Log.d("Notice Search", binding.noticeSearchEt.text.toString())
     }
@@ -58,43 +90,5 @@ class NoticeActivity : AppCompatActivity() {
         else {
             super.onBackPressed()
         }
-    }
-
-    private fun setposition(position:Int){
-
-        binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-        binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-        binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-
-        when (position) {
-            1 -> {
-                updateRVImportant()
-                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
-            }
-            2 -> {
-                updateRVBookmark()
-                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
-
-            }
-            else -> {
-                updateRVAll()
-                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
-            }
-        }
-    }
-
-    private fun updateRVAll() {
-        binding.noticeRv.adapter = noticeRVAdapter
-        binding.noticeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-    }
-
-    private fun updateRVImportant() {
-        binding.noticeRv.adapter = noticeRVAdapter
-        binding.noticeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-    }
-
-    private fun updateRVBookmark() {
-        binding.noticeRv.adapter = noticeRVAdapter
-        binding.noticeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
 }

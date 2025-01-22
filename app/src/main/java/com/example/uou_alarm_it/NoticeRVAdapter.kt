@@ -26,7 +26,7 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
         Notice(false, "울산·경남지역혁신플랫폼 미래모빌리티 기술 관...", 377, "2025-01-03"),
     )
 
-    var bookmarkList : ArrayList<Notice> = arrayListOf()
+    var bookmarkList : HashSet<Notice> = hashSetOf()
 
     interface MyClickListener{
         fun onItemClick(notice: Notice)
@@ -81,6 +81,7 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
 
             binding.itemNoticeBookmark.setOnClickListener {
                 myClickListener.onBookmarkClick(notice)
+                notifyItemChanged(adapterPosition)
             }
         }
     }
