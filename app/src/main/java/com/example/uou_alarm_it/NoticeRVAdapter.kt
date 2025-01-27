@@ -54,7 +54,7 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
                 )
             }
 
-            if(notice.id in bookmarkList) {
+            if(notice in bookmarkList) {
                 binding.itemNoticeBookmark.setImageResource(R.drawable.bookmark_on)
             }
             else{
