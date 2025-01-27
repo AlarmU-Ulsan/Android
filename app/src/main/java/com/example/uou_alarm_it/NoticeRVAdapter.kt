@@ -10,7 +10,6 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
 
     var noticeList : ArrayList<Notice> = NoticeActivity.noticeList
     var bookmarkList : HashSet<Notice> = NoticeActivity.bookmarkList
-    var tabPosition : Int = NoticeActivity.position
 
     interface MyClickListener{
         fun onItemClick(notice: Notice)
