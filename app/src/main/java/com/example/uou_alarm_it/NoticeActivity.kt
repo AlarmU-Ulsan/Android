@@ -7,6 +7,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
 import retrofit2.Call
@@ -187,6 +189,35 @@ class NoticeActivity : AppCompatActivity() {
                 Log.d("Save Bookmark", bookmarkList.toString())
             }
 
+        })
+        binding.noticeRv.setOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (category != 3) {
+                    if(!binding.noticeRv.canScrollVertically(-1)){
+                        Log.d("Paging", "Top of list")
+                    } else if(!binding.noticeRv.canScrollVertically(1)){
+                        RetrofitClient.service.getNotice(category,page++).enqueue(object : Callback<GetNoticeRequest>{
+                            override fun onResponse(
+                                call: Call<GetNoticeRequest>,
+                                response: Response<GetNoticeRequest>
+                            ) {
+                                if (response.body()?.code == "COMMON200") {
+                                    val res = response.body()!!.result
+
+                                    noticeList += res.content
+                                    binding.noticeRv.adapter?.notifyDataSetChanged()
+                                    Log.d("Paging", res.content.toString())
+                                }
+                            }
+
+                            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                                Log.e("retrofit", t.toString())
+                            }
+
+                        })
+                    }
+                }
+            }
         })
         binding.noticeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
