@@ -6,10 +6,14 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class NoticeActivity : AppCompatActivity() {
     lateinit var binding : ActivityNoticeBinding
@@ -17,27 +21,31 @@ class NoticeActivity : AppCompatActivity() {
 
 
     companion object {
-        var position : Int = 0
+        var category : Int = 1
         var noticeList : ArrayList<Notice> = arrayListOf()
         var bookmarkList : HashSet<Notice> = hashSetOf()
     }
+
+    var isLast = false
+    var page = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         bookmarkList = loadBookmarkList()
 
-        setposition(position)
+        initAllTab()
 
         binding.noticeTabAll.setOnClickListener{
-            setposition(0)
+            setCategory(1)
         }
         binding.noticeTabImportant.setOnClickListener {
-            setposition(1)
+            setCategory(0)
         }
         binding.noticeTabBookmark.setOnClickListener {
-            setposition(2)
+            setCategory(3)
         }
+
         binding.noticeSearchIv.setOnClickListener{
             if(binding.noticeSearchEt.visibility == View.GONE) {
                 binding.noticeSearchEt.visibility = View.VISIBLE
@@ -51,30 +59,116 @@ class NoticeActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
-    private fun setposition(position:Int){
+    private fun initAllTab() {
+        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeRequest>{
+            override fun onResponse(
+                call: Call<GetNoticeRequest>,
+                response: Response<GetNoticeRequest>
+            ) {
+                if (response.body()?.code == "COMMON200") {
+                    val res = response.body()!!.result
+
+                    noticeList += res.content
+                    Log.d("retrofit_important", res.content.toString())
+
+                    isLast = res.last
+
+                    if (isLast) {
+                        page = 0
+                        RetrofitClient.service.getNotice(1,page++).enqueue(object : Callback<GetNoticeRequest>{
+                            override fun onResponse(
+                                call: Call<GetNoticeRequest>,
+                                response: Response<GetNoticeRequest>
+                            ) {
+                                if (response.body()?.code == "COMMON200") {
+                                    val res = response.body()!!.result
+
+                                    noticeList += res.content
+                                    Log.d("retrofit_all", res.content.toString())
+                                    initRV()
+                                }
+                            }
+
+                            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                                Log.e("retrofit", t.toString())
+                            }
+
+                        })
+                    } else {
+                        initAllTab()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                Log.e("retrofit", t.toString())
+            }
+
+        })
+    }
+
+    private fun initImportantTab() {
+        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeRequest>{
+            override fun onResponse(
+                call: Call<GetNoticeRequest>,
+                response: Response<GetNoticeRequest>
+            ) {
+                if (response.body()?.code == "COMMON200") {
+                    val res = response.body()!!.result
+
+                    noticeList += res.content
+                    Log.d("retrofit_important", res.content.toString())
+
+                    isLast = res.last
+
+                    if (!isLast) {
+                        initImportantTab()
+                    } else {
+                        initRV()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                Log.e("retrofit", t.toString())
+            }
+
+        })
+
+    }
+
+    private fun setCategory(category:Int){
 
         binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.gray40))
         binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
         binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
 
+        if(category != NoticeActivity.category) {
+            noticeList = arrayListOf()
+            page = 0
+        }
 
-
-        when (position) {
+        when (category) {
             1 -> {
-                NoticeActivity.position = 1
-                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
-                noticeList = arrayListOf() // 주요 공지
-            }
-            2 -> {
-                NoticeActivity.position = 2
-                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
-                noticeList = noticeList.filter { it in bookmarkList }.toCollection(ArrayList())
-            }
-            else -> {
-                NoticeActivity.position = 0
+                NoticeActivity.category = 1
                 binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
+                initAllTab()
+            }
+            0 -> {
+                NoticeActivity.category = 0
+                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
+                initImportantTab()
+            }
+            3 -> {
+                NoticeActivity.category = 3
+                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
+                noticeList = bookmarkList.toCollection(ArrayList())
+                initRV()
             }
         }
+    }
+
+    fun initRV() {
         noticeRVAdapter = NoticeRVAdapter()
         binding.noticeRv.adapter = noticeRVAdapter
         noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener{
@@ -95,6 +189,35 @@ class NoticeActivity : AppCompatActivity() {
                 Log.d("Save Bookmark", bookmarkList.toString())
             }
 
+        })
+        binding.noticeRv.setOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (category != 3) {
+                    if(!binding.noticeRv.canScrollVertically(-1)){
+                        Log.d("Paging", "Top of list")
+                    } else if(!binding.noticeRv.canScrollVertically(1)){
+                        RetrofitClient.service.getNotice(category,page++).enqueue(object : Callback<GetNoticeRequest>{
+                            override fun onResponse(
+                                call: Call<GetNoticeRequest>,
+                                response: Response<GetNoticeRequest>
+                            ) {
+                                if (response.body()?.code == "COMMON200") {
+                                    val res = response.body()!!.result
+
+                                    noticeList += res.content
+                                    binding.noticeRv.adapter?.notifyDataSetChanged()
+                                    Log.d("Paging", res.content.toString())
+                                }
+                            }
+
+                            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                                Log.e("retrofit", t.toString())
+                            }
+
+                        })
+                    }
+                }
+            }
         })
         binding.noticeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
