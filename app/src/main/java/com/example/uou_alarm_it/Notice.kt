@@ -1,8 +1,9 @@
 package com.example.uou_alarm_it
 
 data class Notice(
-    var isImportant : Boolean,
+    var id : Int,
     var title : String,
-    var number : Int,
-    var date : String
+    var date : String,
+    var link : String,
+    var category : String
 )

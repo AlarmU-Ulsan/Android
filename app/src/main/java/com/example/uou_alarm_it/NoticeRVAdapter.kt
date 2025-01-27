@@ -9,8 +9,7 @@ import com.example.uou_alarm_it.databinding.ItemNoticeBinding
 class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
 
     var noticeList : ArrayList<Notice> = NoticeActivity.noticeList
-    var bookmarkList : HashSet<Int> = NoticeActivity.bookmarkList
-    var tabPosition : Int = NoticeActivity.position
+    var bookmarkList : HashSet<Notice> = NoticeActivity.bookmarkList
 
     interface MyClickListener{
         fun onItemClick(notice: Notice)
@@ -41,20 +40,20 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
         fun bind(notice : Notice) {
             binding.itemNoticeTitle.text = notice.title
             binding.itemNoticeDate.text = notice.date
-            if(notice.isImportant) {
+            if(notice.category == "NOTICE") {
                 binding.itemNoticeNumber.text = "공지"
                 binding.itemNotice.setBackgroundColor(
                     ContextCompat.getColor(binding.root.context, R.color.green_20)
                 )
             }
             else {
-                binding.itemNoticeNumber.text = notice.number.toString()
+                binding.itemNoticeNumber.text = notice.id.toString()
                 binding.itemNotice.setBackgroundColor(
                     ContextCompat.getColor(binding.root.context, R.color.transparent)
                 )
             }
 
-            if(notice.number in bookmarkList) {
+            if(notice in bookmarkList) {
                 binding.itemNoticeBookmark.setImageResource(R.drawable.bookmark_on)
             }
             else{
