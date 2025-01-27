@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
@@ -20,7 +19,7 @@ class NoticeActivity : AppCompatActivity() {
 
 
     companion object {
-        var position : Int = 0
+        var category : Int = 1
         var noticeList : ArrayList<Notice> = arrayListOf()
         var bookmarkList : HashSet<Notice> = hashSetOf()
     }
@@ -30,7 +29,7 @@ class NoticeActivity : AppCompatActivity() {
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         bookmarkList = loadBookmarkList()
 
-        RetrofitClient.service.getNotice(2,0).enqueue(object : Callback<GetNoticeRequest>{
+        RetrofitClient.service.getNotice(1,0).enqueue(object : Callback<GetNoticeRequest>{
             override fun onResponse(
                 call: Call<GetNoticeRequest>,
                 response: Response<GetNoticeRequest>
@@ -41,7 +40,7 @@ class NoticeActivity : AppCompatActivity() {
                     noticeList = res.content
                     Log.d("retrofit", res.content.toString())
 
-                    setposition(position)
+                    setCategory(category)
                 }
             }
 
@@ -52,13 +51,13 @@ class NoticeActivity : AppCompatActivity() {
         })
 
         binding.noticeTabAll.setOnClickListener{
-            setposition(0)
+            setCategory(1)
         }
         binding.noticeTabImportant.setOnClickListener {
-            setposition(1)
+            setCategory(0)
         }
         binding.noticeTabBookmark.setOnClickListener {
-            setposition(2)
+            setCategory(3)
         }
 
         binding.noticeSearchIv.setOnClickListener{
@@ -74,31 +73,74 @@ class NoticeActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
-    private fun setposition(position:Int){
+    private fun setCategory(category:Int){
 
         binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.gray40))
         binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
         binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
 
-
-
-        when (position) {
-            1 -> {
-                NoticeActivity.position = 1
-                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
-//                noticeList = arrayListOf() // 주요 공지
-            }
-            2 -> {
-                NoticeActivity.position = 2
-                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
-                noticeList = noticeList.filter { it in bookmarkList }.toCollection(ArrayList())
-            }
-            else -> {
-                NoticeActivity.position = 0
-                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
-            }
+        if(category != NoticeActivity.category) {
+            noticeList = arrayListOf()
         }
 
+        when (category) {
+            1 -> {
+                NoticeActivity.category = 1
+                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
+                RetrofitClient.service.getNotice(category,0).enqueue(object : Callback<GetNoticeRequest>{
+                    override fun onResponse(
+                        call: Call<GetNoticeRequest>,
+                        response: Response<GetNoticeRequest>
+                    ) {
+                        if (response.body()?.code == "COMMON200") {
+                            val res = response.body()!!.result
+
+                            noticeList += res.content
+                            Log.d("retrofit", res.content.toString())
+
+                            initRV()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                        Log.e("retrofit", t.toString())
+                    }
+
+                })
+            }
+            0 -> {
+                NoticeActivity.category = 0
+                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
+                RetrofitClient.service.getNotice(category,0).enqueue(object : Callback<GetNoticeRequest>{
+                    override fun onResponse(
+                        call: Call<GetNoticeRequest>,
+                        response: Response<GetNoticeRequest>
+                    ) {
+                        if (response.body()?.code == "COMMON200") {
+                            val res = response.body()!!.result
+
+                            noticeList += res.content
+                            Log.d("retrofit", res.content.toString())
+                            initRV()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                        Log.e("retrofit", t.toString())
+                    }
+
+                })
+            }
+            3 -> {
+                NoticeActivity.category = 3
+                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
+                noticeList = bookmarkList.toCollection(ArrayList())
+                initRV()
+            }
+        }
+    }
+
+    fun initRV() {
         noticeRVAdapter = NoticeRVAdapter()
         binding.noticeRv.adapter = noticeRVAdapter
         noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener{
