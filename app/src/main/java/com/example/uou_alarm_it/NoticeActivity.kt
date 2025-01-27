@@ -10,6 +10,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class NoticeActivity : AppCompatActivity() {
     lateinit var binding : ActivityNoticeBinding
@@ -27,7 +30,26 @@ class NoticeActivity : AppCompatActivity() {
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         bookmarkList = loadBookmarkList()
 
-        setposition(position)
+        RetrofitClient.service.getNotice(2,0).enqueue(object : Callback<GetNoticeRequest>{
+            override fun onResponse(
+                call: Call<GetNoticeRequest>,
+                response: Response<GetNoticeRequest>
+            ) {
+                if (response.body()?.code == "COMMON200") {
+                    val res = response.body()!!.result
+
+                    noticeList = res.content
+                    Log.d("retrofit", res.content.toString())
+
+                    setposition(position)
+                }
+            }
+
+            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                Log.e("retrofit", t.toString())
+            }
+
+        })
 
         binding.noticeTabAll.setOnClickListener{
             setposition(0)
@@ -38,6 +60,7 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeTabBookmark.setOnClickListener {
             setposition(2)
         }
+
         binding.noticeSearchIv.setOnClickListener{
             if(binding.noticeSearchEt.visibility == View.GONE) {
                 binding.noticeSearchEt.visibility = View.VISIBLE
@@ -63,7 +86,7 @@ class NoticeActivity : AppCompatActivity() {
             1 -> {
                 NoticeActivity.position = 1
                 binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
-                noticeList = arrayListOf() // 주요 공지
+//                noticeList = arrayListOf() // 주요 공지
             }
             2 -> {
                 NoticeActivity.position = 2
@@ -75,6 +98,7 @@ class NoticeActivity : AppCompatActivity() {
                 binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
             }
         }
+
         noticeRVAdapter = NoticeRVAdapter()
         binding.noticeRv.adapter = noticeRVAdapter
         noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener{
