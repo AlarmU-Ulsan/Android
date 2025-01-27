@@ -24,31 +24,15 @@ class NoticeActivity : AppCompatActivity() {
         var bookmarkList : HashSet<Notice> = hashSetOf()
     }
 
+    var isLast = false
+    var page = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         bookmarkList = loadBookmarkList()
 
-        RetrofitClient.service.getNotice(1,0).enqueue(object : Callback<GetNoticeRequest>{
-            override fun onResponse(
-                call: Call<GetNoticeRequest>,
-                response: Response<GetNoticeRequest>
-            ) {
-                if (response.body()?.code == "COMMON200") {
-                    val res = response.body()!!.result
-
-                    noticeList = res.content
-                    Log.d("retrofit", res.content.toString())
-
-                    setCategory(category)
-                }
-            }
-
-            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
-                Log.e("retrofit", t.toString())
-            }
-
-        })
+        initAllTab()
 
         binding.noticeTabAll.setOnClickListener{
             setCategory(1)
@@ -73,6 +57,84 @@ class NoticeActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
+    private fun initAllTab() {
+        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeRequest>{
+            override fun onResponse(
+                call: Call<GetNoticeRequest>,
+                response: Response<GetNoticeRequest>
+            ) {
+                if (response.body()?.code == "COMMON200") {
+                    val res = response.body()!!.result
+
+                    noticeList += res.content
+                    Log.d("retrofit_important", res.content.toString())
+
+                    isLast = res.last
+
+                    if (isLast) {
+                        page = 0
+                        RetrofitClient.service.getNotice(1,page++).enqueue(object : Callback<GetNoticeRequest>{
+                            override fun onResponse(
+                                call: Call<GetNoticeRequest>,
+                                response: Response<GetNoticeRequest>
+                            ) {
+                                if (response.body()?.code == "COMMON200") {
+                                    val res = response.body()!!.result
+
+                                    noticeList += res.content
+                                    Log.d("retrofit_all", res.content.toString())
+                                    initRV()
+                                }
+                            }
+
+                            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                                Log.e("retrofit", t.toString())
+                            }
+
+                        })
+                    } else {
+                        initAllTab()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                Log.e("retrofit", t.toString())
+            }
+
+        })
+    }
+
+    private fun initImportantTab() {
+        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeRequest>{
+            override fun onResponse(
+                call: Call<GetNoticeRequest>,
+                response: Response<GetNoticeRequest>
+            ) {
+                if (response.body()?.code == "COMMON200") {
+                    val res = response.body()!!.result
+
+                    noticeList += res.content
+                    Log.d("retrofit_important", res.content.toString())
+
+                    isLast = res.last
+
+                    if (!isLast) {
+                        initImportantTab()
+                    } else {
+                        initRV()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                Log.e("retrofit", t.toString())
+            }
+
+        })
+
+    }
+
     private fun setCategory(category:Int){
 
         binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.gray40))
@@ -81,55 +143,19 @@ class NoticeActivity : AppCompatActivity() {
 
         if(category != NoticeActivity.category) {
             noticeList = arrayListOf()
+            page = 0
         }
 
         when (category) {
             1 -> {
                 NoticeActivity.category = 1
                 binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
-                RetrofitClient.service.getNotice(category,0).enqueue(object : Callback<GetNoticeRequest>{
-                    override fun onResponse(
-                        call: Call<GetNoticeRequest>,
-                        response: Response<GetNoticeRequest>
-                    ) {
-                        if (response.body()?.code == "COMMON200") {
-                            val res = response.body()!!.result
-
-                            noticeList += res.content
-                            Log.d("retrofit", res.content.toString())
-
-                            initRV()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
-                        Log.e("retrofit", t.toString())
-                    }
-
-                })
+                initAllTab()
             }
             0 -> {
                 NoticeActivity.category = 0
                 binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
-                RetrofitClient.service.getNotice(category,0).enqueue(object : Callback<GetNoticeRequest>{
-                    override fun onResponse(
-                        call: Call<GetNoticeRequest>,
-                        response: Response<GetNoticeRequest>
-                    ) {
-                        if (response.body()?.code == "COMMON200") {
-                            val res = response.body()!!.result
-
-                            noticeList += res.content
-                            Log.d("retrofit", res.content.toString())
-                            initRV()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
-                        Log.e("retrofit", t.toString())
-                    }
-
-                })
+                initImportantTab()
             }
             3 -> {
                 NoticeActivity.category = 3
