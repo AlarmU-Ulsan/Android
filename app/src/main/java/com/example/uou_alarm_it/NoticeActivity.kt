@@ -3,6 +3,8 @@ package com.example.uou_alarm_it
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -65,7 +67,20 @@ class NoticeActivity : AppCompatActivity() {
                 binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
                 binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
                 binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+                onBackPressed()
             }
+        }
+        
+        binding.noticeSearchEt.setOnKeyListener { view, i, keyEvent ->
+            if (keyEvent.action == KeyEvent.ACTION_DOWN && i == KEYCODE_ENTER) {
+                noticeSearch(binding.noticeSearchEt.text.toString())
+
+                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
+                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+                onBackPressed()
+            }
+            true
         }
 
         setContentView(binding.root)
