@@ -15,7 +15,7 @@ class SplashActivity : AppCompatActivity() {
 
         android.os.Handler().postDelayed({
             val intent = Intent(this, NoticeActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             startActivity(intent)
             finish()
         },2000)
