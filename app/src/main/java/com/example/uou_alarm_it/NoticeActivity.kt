@@ -22,6 +22,8 @@ class NoticeActivity : AppCompatActivity() {
     var bookmarkImportant : HashSet<Notice> = hashSetOf()
     var bookmarkCommon : HashSet<Notice> = hashSetOf()
 
+    var keyWord : String = ""
+
 
     companion object {
         var category : Int = 1
@@ -57,7 +59,7 @@ class NoticeActivity : AppCompatActivity() {
                 binding.noticeTabLayout.visibility = View.GONE
             }
             else {
-                noticeSearch()
+                noticeSearch(binding.noticeSearchEt.text.toString())
             }
         }
 
@@ -168,7 +170,7 @@ class NoticeActivity : AppCompatActivity() {
                 NoticeActivity.category = 3
                 binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
                 noticeList = bookmarkList.toCollection(ArrayList())
-                initRV()
+                binding.noticeRv.adapter?.notifyDataSetChanged()
             }
         }
     }
@@ -208,7 +210,14 @@ class NoticeActivity : AppCompatActivity() {
         })
         binding.noticeRv.setOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (category != 3) {
+                if (category == 4) {
+                    if(!binding.noticeRv.canScrollVertically(-1)){
+                        Log.d("Paging", "Top of list")
+                    } else if(!binding.noticeRv.canScrollVertically(1)){
+                        noticeSearch(keyWord)
+                    }
+                }
+                else if (category != 3) {
                     if(!binding.noticeRv.canScrollVertically(-1)){
                         Log.d("Paging", "Top of list")
                     } else if(!binding.noticeRv.canScrollVertically(1)){
@@ -260,8 +269,39 @@ class NoticeActivity : AppCompatActivity() {
         }
     }
 
-    private fun noticeSearch() {
-        Log.d("Notice Search", binding.noticeSearchEt.text.toString())
+
+
+    private fun noticeSearch(keyword : String) {
+        Log.d("Notice Search", keyword)
+
+        NoticeActivity.category = 4
+
+        if (keyWord != keyword) {
+            noticeList = arrayListOf()
+            keyWord = keyword
+            page = 0
+        }
+
+        RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeRequest>{
+            override fun onResponse(
+                call: Call<GetNoticeRequest>,
+                response: Response<GetNoticeRequest>
+            ) {
+                if (response.body()?.code == "COMMON200") {
+                    val res = response.body()!!.result
+
+                    noticeList += res.content
+                    binding.noticeRv.adapter?.notifyDataSetChanged()
+                    Log.d("Paging", res.content.toString())
+                }
+            }
+
+            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                Log.e("retrofit", t.toString())
+            }
+
+        })
+
     }
 
     override fun onBackPressed() {
