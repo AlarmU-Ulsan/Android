@@ -40,6 +40,7 @@ class NoticeActivity : AppCompatActivity() {
         bookmarkList = loadBookmarkList()
         bookmarkList.filter { it.category == "NOTICE"}.toCollection(bookmarkImportant)
         bookmarkList.filter { it.category == "COMMON"}.toCollection(bookmarkCommon)
+        bookmarkList = (bookmarkImportant + bookmarkCommon) as HashSet<Notice>
 
         initAllTab()
 
@@ -60,6 +61,10 @@ class NoticeActivity : AppCompatActivity() {
             }
             else {
                 noticeSearch(binding.noticeSearchEt.text.toString())
+
+                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
+                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
             }
         }
 
@@ -170,7 +175,8 @@ class NoticeActivity : AppCompatActivity() {
                 NoticeActivity.category = 3
                 binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
                 noticeList = bookmarkList.toCollection(ArrayList())
-                binding.noticeRv.adapter?.notifyDataSetChanged()
+                Log.d("Bookmark", noticeList.toString())
+                initRV()
             }
         }
     }
@@ -274,12 +280,11 @@ class NoticeActivity : AppCompatActivity() {
     private fun noticeSearch(keyword : String) {
         Log.d("Notice Search", keyword)
 
-        NoticeActivity.category = 4
-
-        if (keyWord != keyword) {
+        if (keyWord != keyword || category != 4) {
             noticeList = arrayListOf()
             keyWord = keyword
             page = 0
+            category = 4
         }
 
         RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeRequest>{
@@ -291,8 +296,8 @@ class NoticeActivity : AppCompatActivity() {
                     val res = response.body()!!.result
 
                     noticeList += res.content
-                    binding.noticeRv.adapter?.notifyDataSetChanged()
-                    Log.d("Paging", res.content.toString())
+                    initRV()
+
                 }
             }
 
