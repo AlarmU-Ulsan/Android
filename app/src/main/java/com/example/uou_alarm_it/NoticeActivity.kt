@@ -209,6 +209,7 @@ class NoticeActivity : AppCompatActivity() {
             override fun onItemClick(notice: Notice) {
                 Log.d("test", "Item")
                 val intent = Intent(this@NoticeActivity, WebActivity::class.java)
+                intent.putExtra("url", notice.link)
                 this@NoticeActivity.startActivity(intent)
             }
 
