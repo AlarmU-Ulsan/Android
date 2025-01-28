@@ -19,6 +19,9 @@ class NoticeActivity : AppCompatActivity() {
     lateinit var binding : ActivityNoticeBinding
     lateinit var noticeRVAdapter : NoticeRVAdapter
 
+    var bookmarkImportant : HashSet<Notice> = hashSetOf()
+    var bookmarkCommon : HashSet<Notice> = hashSetOf()
+
 
     companion object {
         var category : Int = 1
@@ -33,6 +36,8 @@ class NoticeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         bookmarkList = loadBookmarkList()
+        bookmarkList.filter { it.category == "NOTICE"}.toCollection(bookmarkImportant)
+        bookmarkList.filter { it.category == "COMMON"}.toCollection(bookmarkCommon)
 
         initAllTab()
 
@@ -180,9 +185,20 @@ class NoticeActivity : AppCompatActivity() {
                 Log.d("test", "Bookmark")
                 if (notice in bookmarkList) {
                     bookmarkList.remove(notice)
+                    if (notice.category == "COMMON") {
+                        bookmarkCommon.remove(notice)
+                    } else {
+                        bookmarkImportant.remove(notice)
+                    }
                 }
                 else {
-                    bookmarkList.add(notice)
+                    if (notice.category == "COMMON") {
+                        bookmarkCommon.add(notice)
+                    } else {
+                        bookmarkImportant.add(notice)
+                    }
+
+                    bookmarkList = (bookmarkImportant + bookmarkCommon) as HashSet<Notice>
                 }
                 noticeRVAdapter.bookmarkList = bookmarkList
                 saveBookmarkList(bookmarkList)
@@ -238,7 +254,7 @@ class NoticeActivity : AppCompatActivity() {
 
         return if (json != null) {
             val type = object : com.google.gson.reflect.TypeToken<HashSet<Notice>>() {}.type
-            gson.fromJson(json, type) // JSON 문자열을 ArrayList로 변환
+            gson.fromJson(json, type)
         } else {
             hashSetOf() // 데이터가 없으면 빈 리스트 반환
         }
