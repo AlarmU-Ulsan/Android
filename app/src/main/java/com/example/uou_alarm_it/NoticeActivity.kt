@@ -1,6 +1,7 @@
 package com.example.uou_alarm_it
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -207,6 +208,9 @@ class NoticeActivity : AppCompatActivity() {
         noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener{
             override fun onItemClick(notice: Notice) {
                 Log.d("test", "Item")
+                val intent = Intent(this@NoticeActivity, WebActivity::class.java)
+                intent.putExtra("url", notice.link)
+                this@NoticeActivity.startActivity(intent)
             }
 
             override fun onBookmarkClick(notice: Notice) {
