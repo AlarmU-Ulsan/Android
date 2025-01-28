@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -67,7 +68,8 @@ class NoticeActivity : AppCompatActivity() {
                 binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
                 binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
                 binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-                onBackPressed()
+
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(binding.noticeSearchEt.windowToken, 0)
             }
         }
         
@@ -78,9 +80,12 @@ class NoticeActivity : AppCompatActivity() {
                 binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
                 binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
                 binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-                onBackPressed()
+
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
+
+                return@setOnKeyListener true
             }
-            true
+            false
         }
 
         setContentView(binding.root)
