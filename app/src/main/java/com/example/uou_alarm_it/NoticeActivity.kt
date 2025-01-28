@@ -3,7 +3,10 @@ package com.example.uou_alarm_it
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,7 +68,24 @@ class NoticeActivity : AppCompatActivity() {
                 binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
                 binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
                 binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(binding.noticeSearchEt.windowToken, 0)
             }
+        }
+        
+        binding.noticeSearchEt.setOnKeyListener { view, i, keyEvent ->
+            if (keyEvent.action == KeyEvent.ACTION_DOWN && i == KEYCODE_ENTER) {
+                noticeSearch(binding.noticeSearchEt.text.toString())
+
+                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
+                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
+
+                return@setOnKeyListener true
+            }
+            false
         }
 
         setContentView(binding.root)
