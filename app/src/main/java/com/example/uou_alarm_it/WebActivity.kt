@@ -21,6 +21,7 @@ class WebActivity : AppCompatActivity(){
 
         Log.d("getExtra URL", url)
 
+        binding.webWebviewWv.loadUrl(url)
 
         setContentView(binding.root)
     }
