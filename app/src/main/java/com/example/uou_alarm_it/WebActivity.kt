@@ -1,6 +1,7 @@
 package com.example.uou_alarm_it
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +23,11 @@ class WebActivity : AppCompatActivity(){
         Log.d("getExtra URL", url)
 
         binding.webWebviewWv.loadUrl(url)
+
+        binding.webLinkBtnIv.setOnClickListener {
+            val browserIntent  = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(browserIntent)
+        }
 
         setContentView(binding.root)
     }
