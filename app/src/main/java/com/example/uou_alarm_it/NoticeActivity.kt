@@ -58,6 +58,8 @@ class NoticeActivity : AppCompatActivity() {
             setCategory(3)
         }
 
+        binding.noticeSearchEt.setTextCursorDrawable(R.drawable.edittext_cusor)
+
         binding.noticeSearchIv.setOnClickListener{
             if(binding.noticeSearchEt.visibility == View.GONE) {
                 binding.noticeSearchEt.visibility = View.VISIBLE
