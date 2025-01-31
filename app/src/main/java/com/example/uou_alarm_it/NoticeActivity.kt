@@ -7,6 +7,9 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -58,13 +61,9 @@ class NoticeActivity : AppCompatActivity() {
             setCategory(3)
         }
 
-        binding.noticeSearchEt.setTextCursorDrawable(R.drawable.edittext_cusor)
-
         binding.noticeSearchIv.setOnClickListener{
             if(binding.noticeSearchEt.visibility == View.GONE) {
-                binding.noticeSearchEt.visibility = View.VISIBLE
-                binding.noticeCloseSearchIv.visibility = View.VISIBLE
-                binding.noticeTabLayout.visibility = View.GONE
+                animSearch()
             }
             else {
                 noticeSearch(binding.noticeSearchEt.text.toString())
@@ -76,7 +75,7 @@ class NoticeActivity : AppCompatActivity() {
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(binding.noticeSearchEt.windowToken, 0)
             }
         }
-        
+
         binding.noticeSearchEt.setOnKeyListener { view, i, keyEvent ->
             if (keyEvent.action == KeyEvent.ACTION_DOWN && i == KEYCODE_ENTER) {
                 noticeSearch(binding.noticeSearchEt.text.toString())
@@ -92,8 +91,10 @@ class NoticeActivity : AppCompatActivity() {
             false
         }
 
+        binding.noticeSearchEt.setTextCursorDrawable(R.drawable.edittext_cusor)
+
         binding.noticeCloseSearchIv.setOnClickListener {
-            closeSearch()
+            animSearch()
         }
 
         setContentView(binding.root)
@@ -340,19 +341,54 @@ class NoticeActivity : AppCompatActivity() {
 
     }
 
-    private fun closeSearch(){
-        binding.noticeSearchEt.visibility = View.GONE
-        binding.noticeCloseSearchIv.visibility = View.GONE
-        binding.noticeTabLayout.visibility = View.VISIBLE
-
-    }
-
     override fun onBackPressed() {
         if (binding.noticeSearchEt.visibility == View.VISIBLE) {
-            closeSearch()
+            animSearch()
         }
         else {
             super.onBackPressed()
         }
     }
+
+
+    private fun animSearch() {
+        if (binding.noticeSearchEt.visibility == View.VISIBLE) {
+            val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_close)
+
+            animation.setAnimationListener(object : AnimationListener{
+                override fun onAnimationStart(p0: Animation?) {
+                    binding.noticeTabLayout.visibility = View.VISIBLE
+                    binding.noticeCloseSearchIv.visibility = View.GONE
+                }
+                override fun onAnimationEnd(p0: Animation?) {
+                    binding.noticeSearchEt.visibility = View.GONE
+                }
+                override fun onAnimationRepeat(p0: Animation?) {}
+            })
+
+            binding.noticeSearchEt.startAnimation(animation)
+            Log.d("anim", "close")
+        } else {
+            val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_open)
+
+            animation.setAnimationListener(object : AnimationListener{
+                override fun onAnimationStart(p0: Animation?) {
+                    binding.noticeSearchEt.visibility = View.VISIBLE
+                }
+                override fun onAnimationEnd(p0: Animation?) {
+                    binding.noticeTabLayout.visibility = View.GONE
+                    binding.noticeCloseSearchIv.visibility = View.VISIBLE
+                }
+                override fun onAnimationRepeat(p0: Animation?) {}
+            })
+
+
+            binding.noticeSearchEt.visibility = View.VISIBLE
+
+            binding.noticeSearchEt.startAnimation(animation)
+            Log.d("anim", "open")
+        }
+    }
+
+
 }
