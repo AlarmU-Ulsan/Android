@@ -9,7 +9,7 @@
         android:id="@+id/notice_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background=""
+        android:background="@color/gray5"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -49,8 +49,9 @@
                 android:gravity="center"
                 android:text="전체"
                 android:textColor="@color/black"
-                android:textSize="17dp"
+                android:textSize="18dp"
                 android:textStyle="bold"
+                android:paddingTop="10dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -63,8 +64,9 @@
                 android:gravity="center"
                 android:text="중요 공지"
                 android:textColor="@color/gray40"
-                android:textSize="17dp"
+                android:textSize="18dp"
                 android:textStyle="bold"
+                android:paddingTop="10dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/notice_tab_all"
@@ -79,6 +81,7 @@
                 android:textColor="@color/gray40"
                 android:textSize="18dp"
                 android:textStyle="bold"
+                android:paddingTop="10dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/notice_tab_important"
@@ -115,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_search"
-            android:layout_marginTop="30.5dp"
+            android:layout_marginTop="29dp"
             android:layout_marginEnd="24dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
