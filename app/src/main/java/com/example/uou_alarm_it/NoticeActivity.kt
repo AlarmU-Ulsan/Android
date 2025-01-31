@@ -63,6 +63,7 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeSearchIv.setOnClickListener{
             if(binding.noticeSearchEt.visibility == View.GONE) {
                 binding.noticeSearchEt.visibility = View.VISIBLE
+                binding.noticeCloseSearchIv.visibility = View.VISIBLE
                 binding.noticeTabLayout.visibility = View.GONE
             }
             else {
@@ -89,6 +90,10 @@ class NoticeActivity : AppCompatActivity() {
                 return@setOnKeyListener true
             }
             false
+        }
+
+        binding.noticeCloseSearchIv.setOnClickListener {
+            closeSearch()
         }
 
         setContentView(binding.root)
@@ -335,10 +340,16 @@ class NoticeActivity : AppCompatActivity() {
 
     }
 
+    private fun closeSearch(){
+        binding.noticeSearchEt.visibility = View.GONE
+        binding.noticeCloseSearchIv.visibility = View.GONE
+        binding.noticeTabLayout.visibility = View.VISIBLE
+
+    }
+
     override fun onBackPressed() {
         if (binding.noticeSearchEt.visibility == View.VISIBLE) {
-            binding.noticeSearchEt.visibility = View.GONE
-            binding.noticeTabLayout.visibility = View.VISIBLE
+            closeSearch()
         }
         else {
             super.onBackPressed()
