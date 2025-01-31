@@ -13,7 +13,7 @@
     <color name="gray39">#E0E0E0</color>        <!--item line color-->
     <color name="gray40">#A4A4A4</color>        <!--notice tab bar text off color-->
     <color name="green_10">#F0FFFB</color>      <!--item number color-->
-    <color name="green_20">#CBDDD4</color>      <!--item important background  color-->
+    <color name="green_20">#E8EFE8</color>      <!--item important background  color-->
     <color name="green_40">#AFC9BC</color>      <!--item date color-->
     <color name="green_100">#07713B</color>     <!--item number background color-->
     <color name="green_200">#004C25</color>     <!--bookmark icon line color-->
