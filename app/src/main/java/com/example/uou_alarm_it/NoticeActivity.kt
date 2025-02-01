@@ -328,7 +328,7 @@ class NoticeActivity : AppCompatActivity() {
                     val res = response.body()!!.result
 
                     noticeList += res.content
-                    initRV()
+                    binding.noticeRv.adapter?.notifyDataSetChanged()
 
                 }
             }
