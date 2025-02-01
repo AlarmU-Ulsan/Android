@@ -10,6 +10,6 @@
         android:pivotX="100%"
         android:pivotY="50%"
         android:fillAfter="true"
-        android:duration="500" />
+        android:duration="250" />
 
 </set>
