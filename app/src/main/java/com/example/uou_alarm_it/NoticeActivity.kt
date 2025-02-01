@@ -358,6 +358,7 @@ class NoticeActivity : AppCompatActivity() {
             animation.setAnimationListener(object : AnimationListener{
                 override fun onAnimationStart(p0: Animation?) {
                     binding.noticeTabLayout.visibility = View.VISIBLE
+                    binding.noticeNoticeIv.visibility = View.VISIBLE
                     binding.noticeCloseSearchIv.visibility = View.GONE
                 }
                 override fun onAnimationEnd(p0: Animation?) {
@@ -377,6 +378,7 @@ class NoticeActivity : AppCompatActivity() {
                 }
                 override fun onAnimationEnd(p0: Animation?) {
                     binding.noticeTabLayout.visibility = View.GONE
+                    binding.noticeNoticeIv.visibility = View.GONE
                     binding.noticeCloseSearchIv.visibility = View.VISIBLE
                 }
                 override fun onAnimationRepeat(p0: Animation?) {}
