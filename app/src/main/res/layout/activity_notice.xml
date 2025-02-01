@@ -17,7 +17,7 @@
             android:layout_width="55dp"
             android:layout_height="32.5dp"
             android:src="@drawable/logo_notice"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:layout_marginStart="12dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
@@ -51,7 +51,6 @@
                 android:textColor="@color/black"
                 android:textSize="18dp"
                 android:textStyle="bold"
-                android:paddingTop="10dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +65,6 @@
                 android:textColor="@color/gray40"
                 android:textSize="18dp"
                 android:textStyle="bold"
-                android:paddingTop="10dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/notice_tab_all"
@@ -81,7 +79,6 @@
                 android:textColor="@color/gray40"
                 android:textSize="18dp"
                 android:textStyle="bold"
-                android:paddingTop="10dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/notice_tab_important"
@@ -118,8 +115,8 @@
         
         <ImageView
             android:id="@+id/notice_close_search_iv"
-            android:layout_width="9dp"
-            android:layout_height="9dp"
+            android:layout_width="11dp"
+            android:layout_height="11dp"
             android:src="@drawable/close_search"
             android:visibility="gone"
             android:layout_marginEnd="16dp"
