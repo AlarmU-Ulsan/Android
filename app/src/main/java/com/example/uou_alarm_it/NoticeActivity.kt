@@ -317,6 +317,7 @@ class NoticeActivity : AppCompatActivity() {
             keyWord = keyword
             page = 0
             category = 4
+            initRV()
         }
 
         RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeRequest>{
@@ -363,6 +364,7 @@ class NoticeActivity : AppCompatActivity() {
                 }
                 override fun onAnimationEnd(p0: Animation?) {
                     binding.noticeSearchEt.visibility = View.GONE
+                    binding.noticeSearchEt.setText("")
                 }
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
