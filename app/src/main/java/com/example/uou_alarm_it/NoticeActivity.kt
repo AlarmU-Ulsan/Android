@@ -18,18 +18,27 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
+import com.launchdarkly.eventsource.ConnectStrategy
+import com.launchdarkly.eventsource.EventSource
+import com.launchdarkly.eventsource.background.BackgroundEventSource
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.URL
+import java.util.concurrent.TimeUnit
 
 class NoticeActivity : AppCompatActivity() {
     lateinit var binding : ActivityNoticeBinding
     lateinit var noticeRVAdapter : NoticeRVAdapter
 
+    var eventSource: BackgroundEventSource? = null
+
     var bookmarkImportant : HashSet<Notice> = hashSetOf()
     var bookmarkCommon : HashSet<Notice> = hashSetOf()
 
     var keyWord : String = ""
+
+    lateinit var setting : Setting
 
 
     companion object {
@@ -44,6 +53,7 @@ class NoticeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
+        setting = loadSetting()
         bookmarkList = loadBookmarkList()
         bookmarkList.filter { it.category == "NOTICE"}.toCollection(bookmarkImportant)
         bookmarkList.filter { it.category == "COMMON"}.toCollection(bookmarkCommon)
@@ -97,7 +107,26 @@ class NoticeActivity : AppCompatActivity() {
             animSearch()
         }
 
+        initNotification()
+
+        binding.noticeNoticeIv.setOnClickListener {
+            setting.notificationSetting = !setting.notificationSetting
+            saveSetting(setting)
+            initNotification()
+        }
+
+
         setContentView(binding.root)
+    }
+
+    private fun initNotification() {
+        if (setting.notificationSetting) {
+            binding.noticeNoticeIv.setImageResource(R.drawable.notice_on)
+            connectNotification()
+        } else {
+            binding.noticeNoticeIv.setImageResource(R.drawable.notice_off)
+            unConnectNotification()
+        }
     }
 
     private fun initAllTab() {
@@ -391,6 +420,62 @@ class NoticeActivity : AppCompatActivity() {
 
             binding.noticeSearchEt.startAnimation(animation)
             Log.d("anim", "open")
+        }
+    }
+
+    private fun connectNotification() {
+        // SSE
+        eventSource = BackgroundEventSource
+            .Builder(
+                SSEService(this),
+                EventSource.Builder(
+                    ConnectStrategy
+                        .http(URL("https://alarm-it.githyeon.shop/subscribe"))
+                        // 커스텀 요청 헤더를 명시
+//                        .header(
+//                            "Authorization",
+//                            "Bearer {token}"
+//                        )
+                        .connectTimeout(3, TimeUnit.SECONDS)
+                        // 최대 연결 유지 시간을 설정, 서버에 설정된 최대 연결 유지 시간보다 길게 설정
+                        .readTimeout(600, TimeUnit.SECONDS)
+                )
+            )
+            .threadPriority(Thread.MAX_PRIORITY)
+            .build()
+
+        // EventSource 연결 시작
+        eventSource?.start()
+    }
+
+    private fun unConnectNotification() {
+        try {
+            eventSource?.close()  // null 안전 처리
+        } catch (e: Exception) {
+            Log.e("SSEService", "오류 발생: ${e.message}")
+        } finally {
+            eventSource = null  // eventSource 객체 초기화
+        }
+    }
+
+    fun saveSetting(setting: Setting) {
+        val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(setting.notificationSetting) // List를 JSON 문자열로 변환
+        editor.putString("Setting", json)
+        editor.apply()
+    }
+
+    fun loadSetting(): Setting{
+        val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
+        val gson = Gson()
+        var json = sharedPreferences.getString("Setting", null) // 기본값은 null로 설정
+
+        return if (json != null) {
+            gson.fromJson(json, Setting::class.java)
+        } else {
+            Setting(false)
         }
     }
 
