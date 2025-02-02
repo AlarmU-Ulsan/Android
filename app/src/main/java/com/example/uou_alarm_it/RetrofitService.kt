@@ -10,12 +10,12 @@ interface RetrofitService {
     fun getNotice(
         @Query("category") category: Int, // default: 2/ 0: 일반 공지/ 1: 주요 공지/ 2: 아무것도 아님
         @Query("page") page: Int // default: 0/ 가져올 페이지의 번호
-    ): Call<GetNoticeRequest>
+    ): Call<GetNoticeResponse>
 
     @GET("/search")
     fun getSearch(
         @Query("keyWord") keyWord: String,
         @Query("page") page: Int // default: 0/ 가져올 페이지의 번호
-    ): Call<GetNoticeRequest>
+    ): Call<GetNoticeResponse>
 
 }
