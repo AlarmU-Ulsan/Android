@@ -475,7 +475,7 @@ class NoticeActivity : AppCompatActivity() {
         return if (json != null) {
             gson.fromJson(json, Setting::class.java)
         } else {
-            Setting(false)
+            Setting(true)
         }
     }
 
