@@ -462,7 +462,7 @@ class NoticeActivity : AppCompatActivity() {
         val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
-        val json = gson.toJson(setting.notificationSetting) // List를 JSON 문자열로 변환
+        val json = gson.toJson(setting) // List를 JSON 문자열로 변환
         editor.putString("Setting", json)
         editor.apply()
     }
