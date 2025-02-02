@@ -16,11 +16,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -104,10 +101,10 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun initAllTab() {
-        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeRequest>{
+        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeResponse>{
             override fun onResponse(
-                call: Call<GetNoticeRequest>,
-                response: Response<GetNoticeRequest>
+                call: Call<GetNoticeResponse>,
+                response: Response<GetNoticeResponse>
             ) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
@@ -119,10 +116,10 @@ class NoticeActivity : AppCompatActivity() {
 
                     if (isLast) {
                         page = 0
-                        RetrofitClient.service.getNotice(1,page++).enqueue(object : Callback<GetNoticeRequest>{
+                        RetrofitClient.service.getNotice(1,page++).enqueue(object : Callback<GetNoticeResponse>{
                             override fun onResponse(
-                                call: Call<GetNoticeRequest>,
-                                response: Response<GetNoticeRequest>
+                                call: Call<GetNoticeResponse>,
+                                response: Response<GetNoticeResponse>
                             ) {
                                 if (response.body()?.code == "COMMON200") {
                                     val res = response.body()!!.result
@@ -133,7 +130,7 @@ class NoticeActivity : AppCompatActivity() {
                                 }
                             }
 
-                            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                            override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                                 Log.e("retrofit", t.toString())
                             }
 
@@ -144,7 +141,7 @@ class NoticeActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+            override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
 
@@ -152,10 +149,10 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun initImportantTab() {
-        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeRequest>{
+        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeResponse>{
             override fun onResponse(
-                call: Call<GetNoticeRequest>,
-                response: Response<GetNoticeRequest>
+                call: Call<GetNoticeResponse>,
+                response: Response<GetNoticeResponse>
             ) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
@@ -173,7 +170,7 @@ class NoticeActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+            override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
 
@@ -262,10 +259,10 @@ class NoticeActivity : AppCompatActivity() {
                     if(!binding.noticeRv.canScrollVertically(-1)){
                         Log.d("Paging", "Top of list")
                     } else if(!binding.noticeRv.canScrollVertically(1)){
-                        RetrofitClient.service.getNotice(category,page++).enqueue(object : Callback<GetNoticeRequest>{
+                        RetrofitClient.service.getNotice(category,page++).enqueue(object : Callback<GetNoticeResponse>{
                             override fun onResponse(
-                                call: Call<GetNoticeRequest>,
-                                response: Response<GetNoticeRequest>
+                                call: Call<GetNoticeResponse>,
+                                response: Response<GetNoticeResponse>
                             ) {
                                 if (response.body()?.code == "COMMON200") {
                                     val res = response.body()!!.result
@@ -276,7 +273,7 @@ class NoticeActivity : AppCompatActivity() {
                                 }
                             }
 
-                            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+                            override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                                 Log.e("retrofit", t.toString())
                             }
 
@@ -323,10 +320,10 @@ class NoticeActivity : AppCompatActivity() {
             initRV()
         }
 
-        RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeRequest>{
+        RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeResponse>{
             override fun onResponse(
-                call: Call<GetNoticeRequest>,
-                response: Response<GetNoticeRequest>
+                call: Call<GetNoticeResponse>,
+                response: Response<GetNoticeResponse>
             ) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
@@ -337,7 +334,7 @@ class NoticeActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<GetNoticeRequest>, t: Throwable) {
+            override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
 

@@ -1,37 +1,35 @@
 package com.example.uou_alarm_it
 
-import android.content.Context
-import android.util.Log
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
-import okhttp3.*
-import java.io.IOException
+import com.launchdarkly.eventsource.MessageEvent
+import com.launchdarkly.eventsource.background.BackgroundEventHandler
 
-class SSEService(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class SSEService : BackgroundEventHandler {
 
-    private val okHttpClient = OkHttpClient()
+    override fun onOpen() {
+        // SSE 연결 성공시 처리 로직 작성
 
-    override suspend fun doWork(): Result {
-        val request = Request.Builder()
-            .url(RetrofitClient.BASE_URL + "subscribe")
-            .get()
-            .build()
+    }
 
-        val call = okHttpClient.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.d("SSEService 연결 실패","${e.message}")
-            }
+    override fun onClosed() {
+        // SSE 연결 종료시 처리 로직 작성
+    }
 
-            override fun onResponse(call: Call, response: Response) {
-                Log.d("SSEService", "code :" + response.code.toString() + " / message :" + response.message)
-                if (response.code == 200){
-                    Log.d("SSEService 데이터", response.body.toString())
-                }
+    override fun onMessage(event: String, messageEvent: MessageEvent) {
+        // SSE 이벤트 도착시 처리 로직 작성
 
-            }
-        })
+        // event: String = 이벤트가 속한 채널 또는 토픽 이름
+        // messageEvent.lastEventId: String = 도착한 이벤트 ID
+        // messageEvent.data: String = 도착한 이벤트 데이터
+    }
 
-        return Result.success()
+    override fun onComment(comment: String) {
+    }
+
+    override fun onError(t: Throwable) {
+        // SSE 연결 전 또는 후 오류 발생시 처리 로직 작성
+
+        // 서버가 2XX 이외의 오류 응답시 com.launchdarkly.eventsource.StreamHttpErrorException: Server returned HTTP error 401 예외가 발생
+        // 클라이언트에서 서버의 연결 유지 시간보다 짧게 설정시 error=com.launchdarkly.eventsource.StreamIOException: java.net.SocketTimeoutException: timeout 예외가 발생
+        // 서버가 연결 유지 시간 초과로 종료시 error=com.launchdarkly.eventsource.StreamClosedByServerException: Stream closed by server 예외가 발생
     }
 }
