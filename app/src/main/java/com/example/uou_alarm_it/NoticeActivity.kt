@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,6 +28,8 @@ class NoticeActivity : AppCompatActivity() {
     var bookmarkCommon : HashSet<Notice> = hashSetOf()
 
     var keyWord : String = ""
+
+    private lateinit var sseClient: SSEClient
 
 
     companion object {
@@ -73,7 +76,7 @@ class NoticeActivity : AppCompatActivity() {
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(binding.noticeSearchEt.windowToken, 0)
             }
         }
-        
+
         binding.noticeSearchEt.setOnKeyListener { view, i, keyEvent ->
             if (keyEvent.action == KeyEvent.ACTION_DOWN && i == KEYCODE_ENTER) {
                 noticeSearch(binding.noticeSearchEt.text.toString())
@@ -88,6 +91,11 @@ class NoticeActivity : AppCompatActivity() {
             }
             false
         }
+
+        // OkHttpClient 인스턴스를 함께 전달
+        val client = OkHttpClient()
+        sseClient = SSEClient(this, client)
+        sseClient.connectToSSE()
 
         setContentView(binding.root)
     }
