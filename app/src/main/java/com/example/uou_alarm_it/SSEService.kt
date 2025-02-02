@@ -2,10 +2,14 @@ package com.example.uou_alarm_it
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.google.gson.Gson
 import com.launchdarkly.eventsource.MessageEvent
 import com.launchdarkly.eventsource.background.BackgroundEventHandler
 
@@ -37,7 +41,8 @@ class SSEService(context: Context) : BackgroundEventHandler {
 
         // 이벤트 데이터 처리
         // 예: 받은 데이터를 파싱하거나 화면에 표시하는 등의 작업을 수행할 수 있음
-        showNotification(messageEvent.data, context)
+        val data = Gson().fromJson(messageEvent.data, Notification::class.java)
+        showNotification(data, context)
     }
 
     override fun onComment(comment: String) {
@@ -85,14 +90,29 @@ class SSEService(context: Context) : BackgroundEventHandler {
         }
     }
 
+    val Icon128 = BitmapFactory.decodeResource(context.resources, R.drawable.icon128)
+
     // 알림을 생성하고 표시하는 메서드
-    private fun showNotification(message: String, context: Context) {
+    private fun showNotification(data: Notification, context: Context) {
+        val intent = Intent(context, NoticeActivity::class.java).apply {
+            putExtra("url", data.link)  // 알림에 포함된 데이터 전송
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            context,
+            0,  // requestCode
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)  // 알림 아이콘 설정
-            .setContentTitle("새로운 알림")  // 알림 제목
-            .setContentText(message)  // 알림 내용
+            .setSmallIcon(R.drawable.icon48)
+            .setLargeIcon(Icon128)
+            .setContentTitle("새로운 공지")  // 알림 제목
+            .setContentText(data.title)  // 알림 내용
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // 우선순위 설정
             .setAutoCancel(true)  // 사용자가 알림을 클릭하면 자동으로 알림이 사라짐
+            .setContentIntent(pendingIntent)  // 알림 클릭 시 실행될 PendingIntent 설정
 
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
