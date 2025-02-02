@@ -3,8 +3,6 @@ package com.example.uou_alarm_it
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.uou_alarm_it.databinding.ActivitySplashBinding
 import com.launchdarkly.eventsource.ConnectStrategy
 import com.launchdarkly.eventsource.EventSource
@@ -23,7 +21,7 @@ class SplashActivity : AppCompatActivity() {
         // SSE
         val eventSource: BackgroundEventSource = BackgroundEventSource
             .Builder(
-                SSEService(),
+                SSEService(this),
                 EventSource.Builder(
                     ConnectStrategy
                         .http(URL("https://alarm-it.githyeon.shop/subscribe"))
