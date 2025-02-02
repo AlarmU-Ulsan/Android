@@ -98,7 +98,7 @@ class SSEService(context: Context) : BackgroundEventHandler {
 
     // 알림을 생성하고 표시하는 메서드
     private fun showNotification(data: Notification, context: Context) {
-        val intent = Intent(context, NoticeActivity::class.java).apply {
+        val intent = Intent(context, WebActivity::class.java).apply {
             putExtra("url", data.link)  // 알림에 포함된 데이터 전송
         }
 
