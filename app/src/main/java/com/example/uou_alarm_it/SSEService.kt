@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.gson.Gson
@@ -73,6 +75,8 @@ class SSEService(context: Context) : BackgroundEventHandler {
                 Log.e("SSEService", "알 수 없는 오류: ${t.message}")
             }
         }
+
+        retrySSEConnection()
     }
 
     private fun createNotificationChannel(context: Context) {
@@ -106,7 +110,7 @@ class SSEService(context: Context) : BackgroundEventHandler {
         )
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon48)
+            .setSmallIcon(R.drawable.notice_icon)
             .setLargeIcon(Icon128)
             .setContentTitle("새로운 공지")  // 알림 제목
             .setContentText(data.title)  // 알림 내용
@@ -118,5 +122,13 @@ class SSEService(context: Context) : BackgroundEventHandler {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         notificationManager.notify(0, notificationBuilder.build())  // 알림 표시
+    }
+
+    private fun retrySSEConnection() {
+        // 일정 시간 후 재시도
+        Handler(Looper.getMainLooper()).postDelayed({
+            Log.d("SSEService", "재시도 중...")
+            // 재시도 코드: 다시 SSE 연결을 시도하는 로직을 구현
+        }, 5000) // 5초 후 재시도
     }
 }
