@@ -16,6 +16,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
 import com.google.gson.Gson
 import okhttp3.OkHttpClient

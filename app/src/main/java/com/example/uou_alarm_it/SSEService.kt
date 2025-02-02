@@ -1,30 +1,34 @@
 package com.example.uou_alarm_it
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import okhttp3.*
 import java.io.IOException
 
 class SSEService(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+
+    private val okHttpClient = OkHttpClient()
+
     override suspend fun doWork(): Result {
         val request = Request.Builder()
-            .url(RetrofitClient.BASE_URL + "/subscribe")
+            .url(RetrofitClient.BASE_URL + "subscribe")
             .get()
             .build()
 
-        val call = RetrofitClient.okHttpClient.newCall(request)
+        val call = okHttpClient.newCall(request)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                println("SSEWorker 연결 실패: ${e.message}")
+                Log.d("SSEService 연결 실패","${e.message}")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                response.body?.byteStream()?.bufferedReader()?.useLines { lines ->
-                    lines.forEach { line ->
-                        println("SSEWorker 받은 데이터: $line")
-                    }
+                Log.d("SSEService", "code :" + response.code.toString() + " / message :" + response.message)
+                if (response.code == 200){
+                    Log.d("SSEService 데이터", response.body.toString())
                 }
+
             }
         })
 
