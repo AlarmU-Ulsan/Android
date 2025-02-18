@@ -5,8 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     
     <ImageView
-        android:layout_width="174dp"
-        android:layout_height="122.8dp"
+        android:layout_width="121dp"
+        android:layout_height="85.39dp"
         android:src="@drawable/logo_splash"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
