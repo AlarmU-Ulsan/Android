@@ -41,13 +41,11 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
             binding.itemNoticeTitle.text = notice.title
             binding.itemNoticeDate.text = notice.date
             if(notice.category == "NOTICE") {
-                binding.itemNoticeNumber.text = "공지"
                 binding.itemNotice.setBackgroundColor(
                     ContextCompat.getColor(binding.root.context, R.color.green_20)
                 )
             }
             else {
-                binding.itemNoticeNumber.text = notice.id.toString()
                 binding.itemNotice.setBackgroundColor(
                     ContextCompat.getColor(binding.root.context, R.color.transparent)
                 )
