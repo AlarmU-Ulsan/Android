@@ -353,6 +353,7 @@ class NoticeActivity : AppCompatActivity() {
                                 response: Response<GetNoticeResponse>
                             ) {
                                 if (response.body()?.code == "COMMON200") {
+                                    Log.d("Retrofit",response.code().toString())
                                     val res = response.body()!!.result
 
                                     noticeList += res.content
@@ -468,7 +469,7 @@ class NoticeActivity : AppCompatActivity() {
         eventSource = BackgroundEventSource.Builder(
             SSEService(this),
             EventSource.Builder(
-                ConnectStrategy.http(URL("https://alarm-it.githyeon.shop/subscribe"))
+                ConnectStrategy.http(URL("http://alarm-it.ulsan.ac.kr:58080/subscribe"))
                     .connectTimeout(3, TimeUnit.SECONDS)
                     .readTimeout(600, TimeUnit.SECONDS)
             )

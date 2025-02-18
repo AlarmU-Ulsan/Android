@@ -1,6 +1,7 @@
 package com.example.uou_alarm_it
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -41,9 +42,7 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
             binding.itemNoticeTitle.text = notice.title
             binding.itemNoticeDate.text = notice.date
             if(notice.category == "NOTICE") {
-                binding.itemNotice.setBackgroundColor(
-                    ContextCompat.getColor(binding.root.context, R.color.green_20)
-                )
+                binding.itemNoticeImportMarkIv.visibility = View.VISIBLE
             }
             else {
                 binding.itemNotice.setBackgroundColor(
