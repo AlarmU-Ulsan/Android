@@ -38,8 +38,8 @@
     
     <ImageView
         android:id="@+id/item_notice_bookmark"
-        android:layout_width="12.6dp"
-        android:layout_height="15.3dp"
+        android:layout_width="17dp"
+        android:layout_height="21dp"
         android:src="@drawable/bookmark_off"
         android:layout_marginTop="17dp"
         android:layout_marginEnd="11.6dp"
