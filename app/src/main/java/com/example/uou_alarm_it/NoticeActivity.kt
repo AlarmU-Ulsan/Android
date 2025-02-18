@@ -353,7 +353,6 @@ class NoticeActivity : AppCompatActivity() {
                                 response: Response<GetNoticeResponse>
                             ) {
                                 if (response.body()?.code == "COMMON200") {
-                                    Log.d("Retrofit",response.code().toString())
                                     val res = response.body()!!.result
 
                                     noticeList += res.content
