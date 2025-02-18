@@ -18,7 +18,7 @@
             android:layout_width="32dp"
             android:layout_height="16.3dp"
             android:src="@drawable/logo_notice"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="25dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
