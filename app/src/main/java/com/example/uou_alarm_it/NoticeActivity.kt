@@ -11,7 +11,11 @@ import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,23 +32,22 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class NoticeActivity : AppCompatActivity() {
-    lateinit var binding : ActivityNoticeBinding
-    lateinit var noticeRVAdapter : NoticeRVAdapter
+    lateinit var binding: ActivityNoticeBinding
+    lateinit var noticeRVAdapter: NoticeRVAdapter
 
     var eventSource: BackgroundEventSource? = null
 
-    var bookmarkImportant : HashSet<Notice> = hashSetOf()
-    var bookmarkCommon : HashSet<Notice> = hashSetOf()
+    var bookmarkImportant: HashSet<Notice> = hashSetOf()
+    var bookmarkCommon: HashSet<Notice> = hashSetOf()
 
-    var keyWord : String = ""
+    var keyWord: String = ""
 
-    lateinit var setting : Setting
-
+    lateinit var setting: Setting
 
     companion object {
-        var category : Int = 1
-        var noticeList : ArrayList<Notice> = arrayListOf()
-        var bookmarkList : HashSet<Notice> = hashSetOf()
+        var category: Int = 1
+        var noticeList: ArrayList<Notice> = arrayListOf()
+        var bookmarkList: HashSet<Notice> = hashSetOf()
     }
 
     var isLast = false
@@ -53,36 +56,39 @@ class NoticeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
+        // 뷰를 먼저 attach합니다.
+        setContentView(binding.root)
+
         setting = loadSetting()
         bookmarkList = loadBookmarkList()
-        bookmarkList.filter { it.category == "NOTICE"}.toCollection(bookmarkImportant)
-        bookmarkList.filter { it.category == "COMMON"}.toCollection(bookmarkCommon)
+        bookmarkList.filter { it.category == "NOTICE" }.toCollection(bookmarkImportant)
+        bookmarkList.filter { it.category == "COMMON" }.toCollection(bookmarkCommon)
         bookmarkList = (bookmarkImportant + bookmarkCommon) as HashSet<Notice>
 
         initAllTab()
 
-        binding.noticeTabAll.setOnClickListener{
+        binding.noticeTabAllIv.setOnClickListener {
             setCategory(1)
         }
-        binding.noticeTabImportant.setOnClickListener {
+        binding.noticeTabImportIv.setOnClickListener {
             setCategory(0)
         }
-        binding.noticeTabBookmark.setOnClickListener {
+        binding.noticeTabBookmarkIv.setOnClickListener {
             setCategory(3)
         }
 
-        binding.noticeSearchIv.setOnClickListener{
-            if(binding.noticeSearchEt.visibility == View.GONE) {
+        binding.noticeSearchIv.setOnClickListener {
+            if (binding.noticeSearchEt.visibility == View.GONE) {
                 animSearch()
-            }
-            else {
+            } else {
                 noticeSearch(binding.noticeSearchEt.text.toString())
 
-                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
-                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+                binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_on)
+                binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_off)
+                binding.noticeTabBookmarkIv.setImageResource(R.drawable.btn_tab_bookmark_off)
 
-                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(binding.noticeSearchEt.windowToken, 0)
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(binding.noticeSearchEt.windowToken, 0)
             }
         }
 
@@ -90,11 +96,12 @@ class NoticeActivity : AppCompatActivity() {
             if (keyEvent.action == KeyEvent.ACTION_DOWN && i == KEYCODE_ENTER) {
                 noticeSearch(binding.noticeSearchEt.text.toString())
 
-                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
-                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
+                binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_on)
+                binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_off)
+                binding.noticeTabBookmarkIv.setImageResource(R.drawable.btn_tab_bookmark_off)
 
-                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(view.windowToken, 0)
 
                 return@setOnKeyListener true
             }
@@ -115,8 +122,69 @@ class NoticeActivity : AppCompatActivity() {
             initNotification()
         }
 
-
-        setContentView(binding.root)
+//        // 팝업을 위한 dropdownView 인플레이트 및 설정
+//        val dropdownView = layoutInflater.inflate(R.layout.notice_dropdown, null)
+//        val popupWindow = PopupWindow(
+//            dropdownView,
+//            ConstraintLayout.LayoutParams.MATCH_PARENT,
+//            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+//            true
+//        )
+//
+//        // 드롭다운 내 각 뷰 초기화
+//        val ictTextView = dropdownView.findViewById<TextView>(R.id.dropdown_ict_tv)
+//        val itTextView = dropdownView.findViewById<TextView>(R.id.dropdown_it_tv)
+//        val itItTextView = dropdownView.findViewById<TextView>(R.id.dropdown_it_it_tv)
+//        val itAiTextView = dropdownView.findViewById<TextView>(R.id.dropdown_it_ai_tv)
+//        val itDownBtn = dropdownView.findViewById<ImageView>(R.id.dropdown_it_down_btn_iv)
+//
+//        // IT 하위 옵션은 처음에 숨깁니다.
+//        itItTextView.visibility = View.GONE
+//        itAiTextView.visibility = View.GONE
+//
+//        // ICT 클릭 -> 팝업 종료 처리
+//        ictTextView.setOnClickListener {
+//            // ICT 선택 처리 (예: 상태 저장, UI 업데이트 등)
+//            popupWindow.dismiss()
+//        }
+//
+//        // IT 클릭 -> 하위 옵션 토글 처리
+//        itTextView.setOnClickListener {
+//            if (itItTextView.visibility == View.GONE) {
+//                itItTextView.visibility = View.VISIBLE
+//                itAiTextView.visibility = View.VISIBLE
+//                itDownBtn.setImageResource(R.drawable.btn_it_dropdown_up)
+//            } else {
+//                itItTextView.visibility = View.GONE
+//                itAiTextView.visibility = View.GONE
+//                itDownBtn.setImageResource(R.drawable.btn_it_dropdown_down)
+//            }
+//        }
+//
+//        // IT융합학과 클릭 -> 팝업 종료
+//        itItTextView.setOnClickListener {
+//            // IT융합학과 선택 처리
+//            popupWindow.dismiss()
+//        }
+//
+//        // AI융합학과 클릭 -> 팝업 종료
+//        itAiTextView.setOnClickListener {
+//            // AI융합학과 선택 처리
+//            popupWindow.dismiss()
+//        }
+//
+//        // 팝업 외부 터치를 위한 오버레이 클릭 시 팝업 종료
+//        binding.overlayView.setOnClickListener { popupWindow.dismiss() }
+//
+//        // binding.noticeLogoIv가 attach된 후에 팝업을 표시하도록 post()를 사용합니다.
+//        binding.noticeLogoIv.setOnClickListener {
+//            // 팝업이 이미 열려있다면 닫고, 아니면 열기
+//            if (!popupWindow.isShowing) {
+//                popupWindow.showAsDropDown(binding.noticeLogoIv)
+//            } else {
+//                popupWindow.dismiss()
+//            }
+//        }
     }
 
     private fun initNotification() {
@@ -130,7 +198,7 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun initAllTab() {
-        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeResponse>{
+        RetrofitClient.service.getNotice(0, page++).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(
                 call: Call<GetNoticeResponse>,
                 response: Response<GetNoticeResponse>
@@ -145,7 +213,7 @@ class NoticeActivity : AppCompatActivity() {
 
                     if (isLast) {
                         page = 0
-                        RetrofitClient.service.getNotice(1,page++).enqueue(object : Callback<GetNoticeResponse>{
+                        RetrofitClient.service.getNotice(1, page++).enqueue(object : Callback<GetNoticeResponse> {
                             override fun onResponse(
                                 call: Call<GetNoticeResponse>,
                                 response: Response<GetNoticeResponse>
@@ -162,7 +230,6 @@ class NoticeActivity : AppCompatActivity() {
                             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                                 Log.e("retrofit", t.toString())
                             }
-
                         })
                     } else {
                         initAllTab()
@@ -173,12 +240,11 @@ class NoticeActivity : AppCompatActivity() {
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
-
         })
     }
 
     private fun initImportantTab() {
-        RetrofitClient.service.getNotice(0,page++).enqueue(object : Callback<GetNoticeResponse>{
+        RetrofitClient.service.getNotice(0, page++).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(
                 call: Call<GetNoticeResponse>,
                 response: Response<GetNoticeResponse>
@@ -202,18 +268,15 @@ class NoticeActivity : AppCompatActivity() {
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
-
         })
-
     }
 
-    private fun setCategory(category:Int){
+    private fun setCategory(category: Int) {
+        binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_off)
+        binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_off)
+        binding.noticeTabBookmarkIv.setImageResource(R.drawable.btn_tab_bookmark_off)
 
-        binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-        binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-        binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.gray40))
-
-        if(category != NoticeActivity.category) {
+        if (category != NoticeActivity.category) {
             noticeList = arrayListOf()
             page = 0
         }
@@ -221,17 +284,17 @@ class NoticeActivity : AppCompatActivity() {
         when (category) {
             1 -> {
                 NoticeActivity.category = 1
-                binding.noticeTabAll.setTextColor(ContextCompat.getColor(this, R.color.black))
+                binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_on)
                 initAllTab()
             }
             0 -> {
                 NoticeActivity.category = 0
-                binding.noticeTabImportant.setTextColor(ContextCompat.getColor(this, R.color.black))
+                binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_on)
                 initImportantTab()
             }
             3 -> {
                 NoticeActivity.category = 3
-                binding.noticeTabBookmark.setTextColor(ContextCompat.getColor(this, R.color.black))
+                binding.noticeTabBookmarkIv.setImageResource(R.drawable.btn_tab_bookmark_on)
                 noticeList = bookmarkList.toCollection(ArrayList())
                 Log.d("Bookmark", noticeList.toString())
                 initRV()
@@ -242,7 +305,7 @@ class NoticeActivity : AppCompatActivity() {
     fun initRV() {
         noticeRVAdapter = NoticeRVAdapter()
         binding.noticeRv.adapter = noticeRVAdapter
-        noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener{
+        noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener {
             override fun onItemClick(notice: Notice) {
                 Log.d("test", "Item")
                 val intent = Intent(this@NoticeActivity, WebActivity::class.java)
@@ -259,36 +322,32 @@ class NoticeActivity : AppCompatActivity() {
                     } else {
                         bookmarkImportant.remove(notice)
                     }
-                }
-                else {
+                } else {
                     if (notice.category == "COMMON") {
                         bookmarkCommon.add(notice)
                     } else {
                         bookmarkImportant.add(notice)
                     }
-
                     bookmarkList = (bookmarkImportant + bookmarkCommon) as HashSet<Notice>
                 }
                 noticeRVAdapter.bookmarkList = bookmarkList
                 saveBookmarkList(bookmarkList)
                 Log.d("Save Bookmark", bookmarkList.toString())
             }
-
         })
-        binding.noticeRv.setOnScrollListener(object : OnScrollListener() {
+        binding.noticeRv.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (category == 4) {
-                    if(!binding.noticeRv.canScrollVertically(-1)){
+                    if (!binding.noticeRv.canScrollVertically(-1)) {
                         Log.d("Paging", "Top of list")
-                    } else if(!binding.noticeRv.canScrollVertically(1)){
+                    } else if (!binding.noticeRv.canScrollVertically(1)) {
                         noticeSearch(keyWord)
                     }
-                }
-                else if (category != 3) {
-                    if(!binding.noticeRv.canScrollVertically(-1)){
+                } else if (category != 3) {
+                    if (!binding.noticeRv.canScrollVertically(-1)) {
                         Log.d("Paging", "Top of list")
-                    } else if(!binding.noticeRv.canScrollVertically(1)){
-                        RetrofitClient.service.getNotice(category,page++).enqueue(object : Callback<GetNoticeResponse>{
+                    } else if (!binding.noticeRv.canScrollVertically(1)) {
+                        RetrofitClient.service.getNotice(category, page++).enqueue(object : Callback<GetNoticeResponse> {
                             override fun onResponse(
                                 call: Call<GetNoticeResponse>,
                                 response: Response<GetNoticeResponse>
@@ -305,7 +364,6 @@ class NoticeActivity : AppCompatActivity() {
                             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                                 Log.e("retrofit", t.toString())
                             }
-
                         })
                     }
                 }
@@ -314,11 +372,11 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
 
-    fun saveBookmarkList(BookmarkList : HashSet<Notice>) {
+    fun saveBookmarkList(BookmarkList: HashSet<Notice>) {
         val sharedPreferences = this.getSharedPreferences("Bookmarks", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
-        val json = gson.toJson(BookmarkList) // List를 JSON 문자열로 변환
+        val json = gson.toJson(BookmarkList)
         editor.putString("Bookmark", json)
         editor.apply()
     }
@@ -326,19 +384,16 @@ class NoticeActivity : AppCompatActivity() {
     fun loadBookmarkList(): HashSet<Notice> {
         val sharedPreferences = this.getSharedPreferences("Bookmarks", Context.MODE_PRIVATE)
         val gson = Gson()
-        val json = sharedPreferences.getString("Bookmark", null) // 기본값은 null로 설정
-
+        val json = sharedPreferences.getString("Bookmark", null)
         return if (json != null) {
             val type = object : com.google.gson.reflect.TypeToken<HashSet<Notice>>() {}.type
             gson.fromJson(json, type)
         } else {
-            hashSetOf() // 데이터가 없으면 빈 리스트 반환
+            hashSetOf()
         }
     }
 
-
-
-    private fun noticeSearch(keyword : String) {
+    private fun noticeSearch(keyword: String) {
         Log.d("Notice Search", keyword)
 
         if (keyWord != keyword || category != 4) {
@@ -349,45 +404,37 @@ class NoticeActivity : AppCompatActivity() {
             initRV()
         }
 
-        RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeResponse>{
+        RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(
                 call: Call<GetNoticeResponse>,
                 response: Response<GetNoticeResponse>
             ) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
-
                     noticeList += res.content
                     binding.noticeRv.adapter?.notifyDataSetChanged()
-
                 }
             }
 
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
-
         })
-
     }
 
     override fun onBackPressed() {
         if (binding.noticeSearchEt.visibility == View.VISIBLE) {
             animSearch()
-        }
-        else {
+        } else {
             super.onBackPressed()
         }
     }
 
-
     private fun animSearch() {
         if (binding.noticeSearchEt.visibility == View.VISIBLE) {
             val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_close)
-
-            animation.setAnimationListener(object : AnimationListener{
+            animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
-                    binding.noticeTabLayout.visibility = View.VISIBLE
                     binding.noticeNoticeIv.visibility = View.VISIBLE
                     binding.noticeCloseSearchIv.visibility = View.GONE
                 }
@@ -397,64 +444,47 @@ class NoticeActivity : AppCompatActivity() {
                 }
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
-
             binding.noticeSearchEt.startAnimation(animation)
             Log.d("anim", "close")
         } else {
             val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_open)
-
-            animation.setAnimationListener(object : AnimationListener{
+            animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
                     binding.noticeSearchEt.visibility = View.VISIBLE
                 }
                 override fun onAnimationEnd(p0: Animation?) {
-                    binding.noticeTabLayout.visibility = View.GONE
                     binding.noticeNoticeIv.visibility = View.GONE
                     binding.noticeCloseSearchIv.visibility = View.VISIBLE
                 }
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
-
-
             binding.noticeSearchEt.visibility = View.VISIBLE
-
             binding.noticeSearchEt.startAnimation(animation)
             Log.d("anim", "open")
         }
     }
 
     private fun connectNotification() {
-        // SSE
-        eventSource = BackgroundEventSource
-            .Builder(
-                SSEService(this),
-                EventSource.Builder(
-                    ConnectStrategy
-                        .http(URL("https://alarm-it.githyeon.shop/subscribe"))
-                        // 커스텀 요청 헤더를 명시
-//                        .header(
-//                            "Authorization",
-//                            "Bearer {token}"
-//                        )
-                        .connectTimeout(3, TimeUnit.SECONDS)
-                        // 최대 연결 유지 시간을 설정, 서버에 설정된 최대 연결 유지 시간보다 길게 설정
-                        .readTimeout(600, TimeUnit.SECONDS)
-                )
+        eventSource = BackgroundEventSource.Builder(
+            SSEService(this),
+            EventSource.Builder(
+                ConnectStrategy.http(URL("https://alarm-it.githyeon.shop/subscribe"))
+                    .connectTimeout(3, TimeUnit.SECONDS)
+                    .readTimeout(600, TimeUnit.SECONDS)
             )
+        )
             .threadPriority(Thread.MAX_PRIORITY)
             .build()
-
-        // EventSource 연결 시작
         eventSource?.start()
     }
 
     private fun unConnectNotification() {
         try {
-            eventSource?.close()  // null 안전 처리
+            eventSource?.close()
         } catch (e: Exception) {
             Log.e("SSEService", "오류 발생: ${e.message}")
         } finally {
-            eventSource = null  // eventSource 객체 초기화
+            eventSource = null
         }
     }
 
@@ -462,22 +492,19 @@ class NoticeActivity : AppCompatActivity() {
         val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
-        val json = gson.toJson(setting) // List를 JSON 문자열로 변환
+        val json = gson.toJson(setting)
         editor.putString("Setting", json)
         editor.apply()
     }
 
-    fun loadSetting(): Setting{
+    fun loadSetting(): Setting {
         val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
         val gson = Gson()
-        var json = sharedPreferences.getString("Setting", null) // 기본값은 null로 설정
-
+        val json = sharedPreferences.getString("Setting", null)
         return if (json != null) {
             gson.fromJson(json, Setting::class.java)
         } else {
             Setting(true)
         }
     }
-
-
 }
