@@ -435,10 +435,12 @@ class NoticeActivity : AppCompatActivity() {
             val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_close)
             animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
-                    binding.noticeNoticeIv.visibility = View.VISIBLE
                     binding.noticeCloseSearchIv.visibility = View.GONE
+                    binding.noticeSearchIv.visibility = View.VISIBLE
+
                 }
                 override fun onAnimationEnd(p0: Animation?) {
+                    binding.noticeNoticeIv.visibility = View.VISIBLE
                     binding.noticeSearchEt.visibility = View.GONE
                     binding.noticeSearchEt.setText("")
                 }
@@ -451,10 +453,12 @@ class NoticeActivity : AppCompatActivity() {
             animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
                     binding.noticeSearchEt.visibility = View.VISIBLE
-                }
-                override fun onAnimationEnd(p0: Animation?) {
                     binding.noticeNoticeIv.visibility = View.GONE
                     binding.noticeCloseSearchIv.visibility = View.VISIBLE
+                    binding.noticeSearchIv.visibility = View.GONE
+
+                }
+                override fun onAnimationEnd(p0: Animation?) {
                 }
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
