@@ -41,6 +41,7 @@ class NoticeActivity : AppCompatActivity() {
     var bookmarkCommon: HashSet<Notice> = hashSetOf()
 
     var keyWord: String = ""
+    var major: String = "AI융합전공"
 
     lateinit var setting: Setting
 
@@ -52,6 +53,7 @@ class NoticeActivity : AppCompatActivity() {
 
     var isLast = false
     var page = 0
+    var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +63,8 @@ class NoticeActivity : AppCompatActivity() {
 
         setting = loadSetting()
         bookmarkList = loadBookmarkList()
-        bookmarkList.filter { it.category == "NOTICE" }.toCollection(bookmarkImportant)
-        bookmarkList.filter { it.category == "COMMON" }.toCollection(bookmarkCommon)
+        bookmarkList.filter { it.type == "NOTICE" }.toCollection(bookmarkImportant)
+        bookmarkList.filter { it.type == "COMMON" }.toCollection(bookmarkCommon)
         bookmarkList = (bookmarkImportant + bookmarkCommon) as HashSet<Notice>
 
         initAllTab()
@@ -198,45 +200,18 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun initAllTab() {
-        RetrofitClient.service.getNotice(0, page++).enqueue(object : Callback<GetNoticeResponse> {
-            override fun onResponse(
-                call: Call<GetNoticeResponse>,
-                response: Response<GetNoticeResponse>
-            ) {
+        // 탭이 변경될 때 페이지와 리스트 초기화
+        page = 0
+        noticeList.clear()
+
+        RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
+            override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
-
-                    noticeList += res.content
-                    Log.d("retrofit_important", res.content.toString())
-
-                    isLast = res.last
-
-                    if (isLast) {
-                        page = 0
-                        RetrofitClient.service.getNotice(1, page++).enqueue(object : Callback<GetNoticeResponse> {
-                            override fun onResponse(
-                                call: Call<GetNoticeResponse>,
-                                response: Response<GetNoticeResponse>
-                            ) {
-                                if (response.body()?.code == "COMMON200") {
-                                    val res = response.body()!!.result
-
-                                    noticeList += res.content
-                                    Log.d("retrofit_all", res.content.toString())
-                                    initRV()
-                                }
-                            }
-
-                            override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
-                                Log.e("retrofit", t.toString())
-                            }
-                        })
-                    } else {
-                        initAllTab()
-                    }
+                    noticeList.addAll(res.content)
+                    initRV()  // RecyclerView 어댑터를 초기화해서 화면에 첫 페이지 데이터를 표시
                 }
             }
-
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
@@ -244,27 +219,18 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun initImportantTab() {
-        RetrofitClient.service.getNotice(0, page++).enqueue(object : Callback<GetNoticeResponse> {
-            override fun onResponse(
-                call: Call<GetNoticeResponse>,
-                response: Response<GetNoticeResponse>
-            ) {
+        // 중요 탭일 경우에도 동일하게 한 페이지만 초기 로딩
+        page = 0
+        noticeList.clear()
+
+        RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
+            override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
-
-                    noticeList += res.content
-                    Log.d("retrofit_important", res.content.toString())
-
-                    isLast = res.last
-
-                    if (!isLast) {
-                        initImportantTab()
-                    } else {
-                        initRV()
-                    }
+                    noticeList.addAll(res.content)
+                    initRV()  // RecyclerView 초기화
                 }
             }
-
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
                 Log.e("retrofit", t.toString())
             }
@@ -317,13 +283,13 @@ class NoticeActivity : AppCompatActivity() {
                 Log.d("test", "Bookmark")
                 if (notice in bookmarkList) {
                     bookmarkList.remove(notice)
-                    if (notice.category == "COMMON") {
+                    if (notice.type == "NOTICE") {
                         bookmarkCommon.remove(notice)
                     } else {
                         bookmarkImportant.remove(notice)
                     }
                 } else {
-                    if (notice.category == "COMMON") {
+                    if (notice.type == "NOTICE") {
                         bookmarkCommon.add(notice)
                     } else {
                         bookmarkImportant.add(notice)
@@ -337,34 +303,46 @@ class NoticeActivity : AppCompatActivity() {
         })
         binding.noticeRv.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (category == 4) {
-                    if (!binding.noticeRv.canScrollVertically(-1)) {
-                        Log.d("Paging", "Top of list")
-                    } else if (!binding.noticeRv.canScrollVertically(1)) {
-                        noticeSearch(keyWord)
-                    }
-                } else if (category != 3) {
-                    if (!binding.noticeRv.canScrollVertically(-1)) {
-                        Log.d("Paging", "Top of list")
-                    } else if (!binding.noticeRv.canScrollVertically(1)) {
-                        RetrofitClient.service.getNotice(category, page++).enqueue(object : Callback<GetNoticeResponse> {
-                            override fun onResponse(
-                                call: Call<GetNoticeResponse>,
-                                response: Response<GetNoticeResponse>
-                            ) {
-                                if (response.body()?.code == "COMMON200") {
-                                    val res = response.body()!!.result
-
-                                    noticeList += res.content
-                                    binding.noticeRv.adapter?.notifyDataSetChanged()
-                                    Log.d("Paging", res.content.toString())
-                                }
+                // 스크롤이 멈췄을 때 (IDLE 상태) 처리하도록 변경
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if (category == 4) {
+                        // 검색 탭의 경우
+                        if (!binding.noticeRv.canScrollVertically(-1)) {
+                            Log.d("Paging", "Top of list")
+                        } else if (!binding.noticeRv.canScrollVertically(1)) {
+                            if (!isLoading) {
+                                isLoading = true
+                                noticeSearch(keyWord)
                             }
-
-                            override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
-                                Log.e("retrofit", t.toString())
+                        }
+                    } else if (category != 3) {
+                        // 일반(전체, 중요) 탭의 경우
+                        if (!binding.noticeRv.canScrollVertically(-1)) {
+                            Log.d("Paging", "Top of list")
+                        } else if (!binding.noticeRv.canScrollVertically(1)) {
+                            if (!isLoading) {
+                                isLoading = true
+                                RetrofitClient.service.getNotice(category, page++, major)
+                                    .enqueue(object : Callback<GetNoticeResponse> {
+                                        override fun onResponse(
+                                            call: Call<GetNoticeResponse>,
+                                            response: Response<GetNoticeResponse>
+                                        ) {
+                                            isLoading = false
+                                            if (response.body()?.code == "COMMON200") {
+                                                val res = response.body()!!.result
+                                                noticeList.addAll(res.content)
+                                                binding.noticeRv.adapter?.notifyDataSetChanged()
+                                                Log.d("Paging", res.content.toString())
+                                            }
+                                        }
+                                        override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
+                                            isLoading = false
+                                            Log.e("retrofit", t.toString())
+                                        }
+                                    })
                             }
-                        })
+                        }
                     }
                 }
             }
@@ -404,19 +382,24 @@ class NoticeActivity : AppCompatActivity() {
             initRV()
         }
 
-        RetrofitClient.service.getSearch(keyword, page++).enqueue(object : Callback<GetNoticeResponse> {
+        // 이미 로딩 중이면 중복 호출 방지
+        if (isLoading) return
+        isLoading = true
+
+        RetrofitClient.service.getSearch(keyword, major, page++).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(
                 call: Call<GetNoticeResponse>,
                 response: Response<GetNoticeResponse>
             ) {
+                isLoading = false
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
-                    noticeList += res.content
+                    noticeList.addAll(res.content)
                     binding.noticeRv.adapter?.notifyDataSetChanged()
                 }
             }
-
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
+                isLoading = false
                 Log.e("retrofit", t.toString())
             }
         })

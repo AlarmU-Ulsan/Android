@@ -5,5 +5,6 @@ data class Notice(
     var title : String,
     var date : String,
     var link : String,
-    var category : String
+    var type : String,
+    var major : String
 )

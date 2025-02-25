@@ -41,7 +41,7 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
         fun bind(notice : Notice) {
             binding.itemNoticeTitle.text = notice.title
             binding.itemNoticeDate.text = notice.date
-            if(notice.category == "NOTICE") {
+            if(notice.type == "NOTICE") {
                 binding.itemNoticeImportMarkIv.visibility = View.VISIBLE
             }
             else {
