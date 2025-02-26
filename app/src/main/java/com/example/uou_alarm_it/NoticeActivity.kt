@@ -117,7 +117,20 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeSearchEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString()
-                noticeSearch(query)
+                // 검색어가 비면 기본 조회로 복원
+                if(query.isEmpty()){
+                    when(category){
+                        1 -> initAllTab()
+                        0 -> initImportantTab()
+                        3 -> {
+                            noticeList = bookmarkList.toCollection(ArrayList())
+                            initRV()
+                            updateEmptyState()
+                        }
+                    }
+                } else {
+                    noticeSearch(query)
+                }
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -210,6 +223,16 @@ class NoticeActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateEmptyState() {
+        if (noticeList.isEmpty()) {
+            binding.noticeEmptyLogoIv.visibility = View.VISIBLE
+            binding.noticeRv.visibility = View.GONE
+        } else {
+            binding.noticeEmptyLogoIv.visibility = View.GONE
+            binding.noticeRv.visibility = View.VISIBLE
+        }
+    }
+
     private fun initAllTab() {
         // 탭이 변경될 때 페이지와 리스트 초기화
         page = 0
@@ -221,6 +244,7 @@ class NoticeActivity : AppCompatActivity() {
                     val res = response.body()!!.result
                     noticeList.addAll(res.content)
                     initRV()  // RecyclerView 어댑터를 초기화해서 화면에 첫 페이지 데이터를 표시
+                    updateEmptyState()
                 }
             }
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
@@ -240,6 +264,7 @@ class NoticeActivity : AppCompatActivity() {
                     val res = response.body()!!.result
                     noticeList.addAll(res.content.filter { it.type == "NOTICE" })
                     initRV()  // RecyclerView 초기화
+                    updateEmptyState()
                 }
             }
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
@@ -275,6 +300,7 @@ class NoticeActivity : AppCompatActivity() {
                 noticeList = bookmarkList.toCollection(ArrayList())
                 Log.d("Bookmark", noticeList.toString())
                 initRV()
+                updateEmptyState()
             }
         }
     }
@@ -349,6 +375,7 @@ class NoticeActivity : AppCompatActivity() {
                                                 }
                                                 noticeList.addAll(newItems)
                                                 binding.noticeRv.adapter?.notifyDataSetChanged()
+                                                updateEmptyState()
                                                 Log.d("Paging", newItems.toString())
                                             }
                                         }
@@ -406,6 +433,7 @@ class NoticeActivity : AppCompatActivity() {
                 3 -> {
                     noticeList = bookmarkList.toCollection(ArrayList())
                     initRV()
+                    updateEmptyState()
                 }
             }
             return
@@ -418,6 +446,7 @@ class NoticeActivity : AppCompatActivity() {
             }
             noticeList = filtered.toCollection(ArrayList())
             initRV()
+            updateEmptyState()
             return
         }
 
@@ -439,6 +468,7 @@ class NoticeActivity : AppCompatActivity() {
                     }
                     noticeList.addAll(newItems)
                     binding.noticeRv.adapter?.notifyDataSetChanged()
+                    updateEmptyState()
                 }
             }
             override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
