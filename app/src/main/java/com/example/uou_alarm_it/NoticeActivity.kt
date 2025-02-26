@@ -529,7 +529,7 @@ class NoticeActivity : AppCompatActivity() {
         eventSource = BackgroundEventSource.Builder(
             SSEService(this),
             EventSource.Builder(
-                ConnectStrategy.http(URL("https://alarm-it.ulsan.ac.kr:58080/subscribe"))
+                ConnectStrategy.http(URL("https://alarm-it.ulsan.ac.kr:58080/notification/subscribe"))
                     .connectTimeout(3, TimeUnit.SECONDS)
                     .readTimeout(600, TimeUnit.SECONDS)
             )
