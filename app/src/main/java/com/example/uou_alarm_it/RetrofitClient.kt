@@ -9,7 +9,7 @@ import java.net.CookieManager
 class RetrofitClient {
 
     companion object {
-        const val BASE_URL = "http://alarm-it.ulsan.ac.kr:58080/" // url
+        const val BASE_URL = "https://alarm-it.ulsan.ac.kr:58080" // url
 
         var builder = OkHttpClient().newBuilder()
         var okHttpClient = builder
