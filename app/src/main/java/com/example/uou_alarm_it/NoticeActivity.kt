@@ -41,7 +41,7 @@ class NoticeActivity : AppCompatActivity() {
     var bookmarkCommon: HashSet<Notice> = hashSetOf()
 
     var keyWord: String = ""
-    var major: String = "AI융합전공"
+    var major: String = "IT융합전공"
 
     lateinit var setting: Setting
 
@@ -227,7 +227,7 @@ class NoticeActivity : AppCompatActivity() {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
-                    noticeList.addAll(res.content)
+                    noticeList.addAll(res.content.filter { it.type == "NOTICE" })
                     initRV()  // RecyclerView 초기화
                 }
             }
@@ -316,7 +316,6 @@ class NoticeActivity : AppCompatActivity() {
                             }
                         }
                     } else if (category != 3) {
-                        // 일반(전체, 중요) 탭의 경우
                         if (!binding.noticeRv.canScrollVertically(-1)) {
                             Log.d("Paging", "Top of list")
                         } else if (!binding.noticeRv.canScrollVertically(1)) {
@@ -331,9 +330,15 @@ class NoticeActivity : AppCompatActivity() {
                                             isLoading = false
                                             if (response.body()?.code == "COMMON200") {
                                                 val res = response.body()!!.result
-                                                noticeList.addAll(res.content)
+                                                // 만약 중요 탭(category == 0)이라면 type이 "NOTICE"인 항목만 추가
+                                                val newItems = if (category == 0) {
+                                                    res.content.filter { it.type == "NOTICE" }
+                                                } else {
+                                                    res.content
+                                                }
+                                                noticeList.addAll(newItems)
                                                 binding.noticeRv.adapter?.notifyDataSetChanged()
-                                                Log.d("Paging", res.content.toString())
+                                                Log.d("Paging", newItems.toString())
                                             }
                                         }
                                         override fun onFailure(call: Call<GetNoticeResponse>, t: Throwable) {
@@ -455,7 +460,7 @@ class NoticeActivity : AppCompatActivity() {
         eventSource = BackgroundEventSource.Builder(
             SSEService(this),
             EventSource.Builder(
-                ConnectStrategy.http(URL("http://alarm-it.ulsan.ac.kr:58080/subscribe"))
+                ConnectStrategy.http(URL("https://alarm-it.ulsan.ac.kr:58080/subscribe"))
                     .connectTimeout(3, TimeUnit.SECONDS)
                     .readTimeout(600, TimeUnit.SECONDS)
             )
