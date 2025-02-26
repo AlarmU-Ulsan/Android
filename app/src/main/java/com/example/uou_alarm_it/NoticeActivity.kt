@@ -3,6 +3,8 @@ package com.example.uou_alarm_it
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_ENTER
@@ -111,6 +113,15 @@ class NoticeActivity : AppCompatActivity() {
         }
 
         binding.noticeSearchEt.setTextCursorDrawable(R.drawable.edittext_cusor)
+
+        binding.noticeSearchEt.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val query = s.toString()
+                noticeSearch(query)
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         binding.noticeCloseSearchIv.setOnClickListener {
             animSearch()
@@ -379,27 +390,54 @@ class NoticeActivity : AppCompatActivity() {
     private fun noticeSearch(keyword: String) {
         Log.d("Notice Search", keyword)
 
-        if (keyWord != keyword || category != 4) {
+        // 만약 이전 검색어와 달라졌다면 리스트와 페이지를 초기화
+        if (keyWord != keyword) {
             noticeList = arrayListOf()
             keyWord = keyword
             page = 0
-            category = 4
             initRV()
+        }
+
+        // 검색어가 비었으면 현재 탭의 기본 조회로 복원
+        if (keyword.isEmpty()) {
+            when (NoticeActivity.category) {
+                1 -> initAllTab()
+                0 -> initImportantTab()
+                3 -> {
+                    noticeList = bookmarkList.toCollection(ArrayList())
+                    initRV()
+                }
+            }
+            return
+        }
+
+        // 북마크 탭일 경우, 로컬 필터링 진행
+        if (NoticeActivity.category == 3) {
+            val filtered = bookmarkList.filter {
+                it.title.contains(keyword, ignoreCase = true)
+            }
+            noticeList = filtered.toCollection(ArrayList())
+            initRV()
+            return
         }
 
         // 이미 로딩 중이면 중복 호출 방지
         if (isLoading) return
         isLoading = true
 
+        // 전체 탭(1)와 중요 탭(0)의 경우 API 호출
         RetrofitClient.service.getSearch(keyword, major, page++).enqueue(object : Callback<GetNoticeResponse> {
-            override fun onResponse(
-                call: Call<GetNoticeResponse>,
-                response: Response<GetNoticeResponse>
-            ) {
+            override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 isLoading = false
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
-                    noticeList.addAll(res.content)
+                    // 중요 탭이면 type이 "NOTICE"인 게시물만 선택
+                    val newItems = if (NoticeActivity.category == 0) {
+                        res.content.filter { it.type == "NOTICE" }
+                    } else {
+                        res.content
+                    }
+                    noticeList.addAll(newItems)
                     binding.noticeRv.adapter?.notifyDataSetChanged()
                 }
             }
@@ -425,12 +463,15 @@ class NoticeActivity : AppCompatActivity() {
                 override fun onAnimationStart(p0: Animation?) {
                     binding.noticeCloseSearchIv.visibility = View.GONE
                     binding.noticeSearchIv.visibility = View.VISIBLE
-
                 }
                 override fun onAnimationEnd(p0: Animation?) {
                     binding.noticeNoticeIv.visibility = View.VISIBLE
                     binding.noticeSearchEt.visibility = View.GONE
                     binding.noticeSearchEt.setText("")
+                    // 검색 취소 시 기본 조회로 복원 (예: AllTab, 카테고리 1)
+                    if (category == 4) {
+                        setCategory(1)
+                    }
                 }
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
@@ -444,10 +485,8 @@ class NoticeActivity : AppCompatActivity() {
                     binding.noticeNoticeIv.visibility = View.GONE
                     binding.noticeCloseSearchIv.visibility = View.VISIBLE
                     binding.noticeSearchIv.visibility = View.GONE
-
                 }
-                override fun onAnimationEnd(p0: Animation?) {
-                }
+                override fun onAnimationEnd(p0: Animation?) {}
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
             binding.noticeSearchEt.visibility = View.VISIBLE
