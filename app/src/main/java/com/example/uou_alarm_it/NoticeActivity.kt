@@ -81,7 +81,7 @@ class NoticeActivity : AppCompatActivity() {
             setCategory(3)
         }
 
-        binding.noticeSearchIv.setOnClickListener {
+        binding.noticeSearchCl.setOnClickListener {
             if (binding.noticeSearchEt.visibility == View.GONE) {
                 animSearch()
             } else {
@@ -142,7 +142,7 @@ class NoticeActivity : AppCompatActivity() {
 
         initNotification()
 
-        binding.noticeNoticeIv.setOnClickListener {
+        binding.noticeNoticeCl.setOnClickListener {
             setting.notificationSetting = !setting.notificationSetting
             saveSetting(setting)
             initNotification()

@@ -50,7 +50,17 @@
             app:layout_constraintTop_toTopOf="@id/notice_search_et"
             app:layout_constraintBottom_toBottomOf="@id/notice_search_et"
             app:layout_constraintEnd_toEndOf="parent"/>
-        
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/notice_search_cl"
+            android:padding="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/notice_search_iv"
+            app:layout_constraintBottom_toBottomOf="@id/notice_search_iv"
+            app:layout_constraintStart_toStartOf="@id/notice_search_iv"
+            app:layout_constraintEnd_toEndOf="@id/notice_search_iv"/>
+
         <ImageView
             android:id="@+id/notice_search_iv"
             android:layout_width="wrap_content"
@@ -59,7 +69,17 @@
             app:layout_constraintTop_toTopOf="@id/notice_logo_iv"
             app:layout_constraintBottom_toBottomOf="@id/notice_logo_iv"
             app:layout_constraintEnd_toEndOf="parent"/>
-        
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/notice_notice_cl"
+            android:padding="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/notice_notice_iv"
+            app:layout_constraintBottom_toBottomOf="@id/notice_notice_iv"
+            app:layout_constraintStart_toStartOf="@id/notice_notice_iv"
+            app:layout_constraintEnd_toEndOf="@id/notice_notice_iv"/>
+
         <ImageView
             android:id="@+id/notice_notice_iv"
             android:layout_width="18.7dp"

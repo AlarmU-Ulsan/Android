@@ -53,7 +53,7 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
                 binding.itemNoticeBookmark.setImageResource(R.drawable.bookmark_off)
             }
 
-            binding.itemNoticeBookmark.setOnClickListener {
+            binding.itemNoticeBookmarkCl.setOnClickListener {
                 myClickListener.onBookmarkClick(notice)
                 notifyItemChanged(adapterPosition)
             }
