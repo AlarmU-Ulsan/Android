@@ -492,10 +492,13 @@ class NoticeActivity : AppCompatActivity() {
             animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
                     binding.noticeCloseSearchIv.visibility = View.GONE
+                    binding.noticeCloseSearchCl.visibility = View.GONE
                     binding.noticeSearchIv.visibility = View.VISIBLE
+                    binding.noticeSearchCl.visibility = View.VISIBLE
                 }
                 override fun onAnimationEnd(p0: Animation?) {
                     binding.noticeNoticeIv.visibility = View.VISIBLE
+                    binding.noticeNoticeCl.visibility = View.VISIBLE
                     binding.noticeSearchEt.visibility = View.GONE
                     binding.noticeSearchEt.setText("")
                     // 검색 취소 시 기본 조회로 복원 (예: AllTab, 카테고리 1)
@@ -513,8 +516,11 @@ class NoticeActivity : AppCompatActivity() {
                 override fun onAnimationStart(p0: Animation?) {
                     binding.noticeSearchEt.visibility = View.VISIBLE
                     binding.noticeNoticeIv.visibility = View.GONE
+                    binding.noticeNoticeCl.visibility = View.GONE
                     binding.noticeCloseSearchIv.visibility = View.VISIBLE
+                    binding.noticeCloseSearchCl.visibility = View.VISIBLE
                     binding.noticeSearchIv.visibility = View.GONE
+                    binding.noticeSearchCl.visibility = View.GONE
                 }
                 override fun onAnimationEnd(p0: Animation?) {}
                 override fun onAnimationRepeat(p0: Animation?) {}
