@@ -160,7 +160,12 @@ class NoticeActivity : AppCompatActivity() {
             // MajorActivity에서 전달한 선택된 아이템의 텍스트 데이터 받기
             val selectedText = data?.getStringExtra("selectedItem")
             Log.d("NoticeActivity", "Selected item: $selectedText")
-            // 예를 들어 UI 업데이트, 검색어 변경 등 원하는 처리를 수행
+            binding.noticeSelectedMajorTv.text = selectedText
+            if (!selectedText.isNullOrEmpty()) {
+                major = selectedText
+            }
+            // 현재 탭(모든 API 호출 함수들에서 major 변수 사용)이 다시 새로고침되도록 재설정
+            setCategory(category)
         }
     }
 

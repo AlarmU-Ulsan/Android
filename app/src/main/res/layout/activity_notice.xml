@@ -38,7 +38,7 @@
                 android:id="@+id/notice_selected_major_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ICT융합학부"
+                android:text="IT융합전공"
                 android:textSize="15dp"
                 android:textColor="@color/black"/>
             
