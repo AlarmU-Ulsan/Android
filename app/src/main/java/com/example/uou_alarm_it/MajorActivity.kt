@@ -33,7 +33,7 @@ class MajorActivity : AppCompatActivity() {
         val totalRows = (items.size + columnCount - 1) / columnCount
 
         // 32dp를 픽셀로 변환
-        val marginPx = (32 * resources.displayMetrics.density + 0.5f).toInt()
+        val marginPx = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
         for ((index, item) in items.withIndex()) {
             // grid_item.xml 레이아웃 inflate
