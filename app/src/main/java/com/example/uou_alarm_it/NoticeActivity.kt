@@ -163,6 +163,8 @@ class NoticeActivity : AppCompatActivity() {
             binding.noticeSelectedMajorTv.text = selectedText
             if (!selectedText.isNullOrEmpty()) {
                 major = selectedText
+                unConnectNotification()
+                connectNotification()
             }
             // 현재 탭(모든 API 호출 함수들에서 major 변수 사용)이 다시 새로고침되도록 재설정
             setCategory(category)
@@ -491,7 +493,7 @@ class NoticeActivity : AppCompatActivity() {
         eventSource = BackgroundEventSource.Builder(
             SSEService(this),
             EventSource.Builder(
-                ConnectStrategy.http(URL("https://alarm-it.ulsan.ac.kr:58080/notification/subscribe"))
+                ConnectStrategy.http(URL("https://alarm-it.ulsan.ac.kr:58080/notification/subscribe?major=$major"))
                     .connectTimeout(3, TimeUnit.SECONDS)
                     .readTimeout(600, TimeUnit.SECONDS)
             )
