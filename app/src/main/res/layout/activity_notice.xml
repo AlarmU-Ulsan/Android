@@ -198,7 +198,7 @@
         android:layout_width="191.7dp"
         android:layout_height="115.5dp"
         android:src="@drawable/img_empty_logo"
-        app:layout_constraintTop_toTopOf="@id/notice_line_view"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
