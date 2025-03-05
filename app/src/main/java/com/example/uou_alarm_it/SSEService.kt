@@ -121,7 +121,8 @@ class SSEService(context: Context) : BackgroundEventHandler {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        notificationManager.notify(0, notificationBuilder.build())  // 알림 표시
+        val notificationId = (0..Int.MAX_VALUE).random()
+        notificationManager.notify(notificationId, notificationBuilder.build())  // 알림 표시
     }
 
     private fun retrySSEConnection() {
