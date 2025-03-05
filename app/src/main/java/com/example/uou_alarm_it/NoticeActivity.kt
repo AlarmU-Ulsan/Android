@@ -51,6 +51,7 @@ class NoticeActivity : AppCompatActivity() {
         var category: Int = 1
         var noticeList: ArrayList<Notice> = arrayListOf()
         var bookmarkList: HashSet<Notice> = hashSetOf()
+        const val REQUEST_CODE_MAJOR = 100
     }
 
     var isLast = false
@@ -147,70 +148,20 @@ class NoticeActivity : AppCompatActivity() {
             saveSetting(setting)
             initNotification()
         }
+        binding.noticeSelectBtnLl.setOnClickListener {
+            val intent = Intent(this, MajorActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE_MAJOR)
+        }
+    }
 
-//        // 팝업을 위한 dropdownView 인플레이트 및 설정
-//        val dropdownView = layoutInflater.inflate(R.layout.notice_dropdown, null)
-//        val popupWindow = PopupWindow(
-//            dropdownView,
-//            ConstraintLayout.LayoutParams.MATCH_PARENT,
-//            ConstraintLayout.LayoutParams.WRAP_CONTENT,
-//            true
-//        )
-//
-//        // 드롭다운 내 각 뷰 초기화
-//        val ictTextView = dropdownView.findViewById<TextView>(R.id.dropdown_ict_tv)
-//        val itTextView = dropdownView.findViewById<TextView>(R.id.dropdown_it_tv)
-//        val itItTextView = dropdownView.findViewById<TextView>(R.id.dropdown_it_it_tv)
-//        val itAiTextView = dropdownView.findViewById<TextView>(R.id.dropdown_it_ai_tv)
-//        val itDownBtn = dropdownView.findViewById<ImageView>(R.id.dropdown_it_down_btn_iv)
-//
-//        // IT 하위 옵션은 처음에 숨깁니다.
-//        itItTextView.visibility = View.GONE
-//        itAiTextView.visibility = View.GONE
-//
-//        // ICT 클릭 -> 팝업 종료 처리
-//        ictTextView.setOnClickListener {
-//            // ICT 선택 처리 (예: 상태 저장, UI 업데이트 등)
-//            popupWindow.dismiss()
-//        }
-//
-//        // IT 클릭 -> 하위 옵션 토글 처리
-//        itTextView.setOnClickListener {
-//            if (itItTextView.visibility == View.GONE) {
-//                itItTextView.visibility = View.VISIBLE
-//                itAiTextView.visibility = View.VISIBLE
-//                itDownBtn.setImageResource(R.drawable.btn_it_dropdown_up)
-//            } else {
-//                itItTextView.visibility = View.GONE
-//                itAiTextView.visibility = View.GONE
-//                itDownBtn.setImageResource(R.drawable.btn_it_dropdown_down)
-//            }
-//        }
-//
-//        // IT융합학과 클릭 -> 팝업 종료
-//        itItTextView.setOnClickListener {
-//            // IT융합학과 선택 처리
-//            popupWindow.dismiss()
-//        }
-//
-//        // AI융합학과 클릭 -> 팝업 종료
-//        itAiTextView.setOnClickListener {
-//            // AI융합학과 선택 처리
-//            popupWindow.dismiss()
-//        }
-//
-//        // 팝업 외부 터치를 위한 오버레이 클릭 시 팝업 종료
-//        binding.overlayView.setOnClickListener { popupWindow.dismiss() }
-//
-//        // binding.noticeLogoIv가 attach된 후에 팝업을 표시하도록 post()를 사용합니다.
-//        binding.noticeLogoIv.setOnClickListener {
-//            // 팝업이 이미 열려있다면 닫고, 아니면 열기
-//            if (!popupWindow.isShowing) {
-//                popupWindow.showAsDropDown(binding.noticeLogoIv)
-//            } else {
-//                popupWindow.dismiss()
-//            }
-//        }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_MAJOR && resultCode == RESULT_OK) {
+            // MajorActivity에서 전달한 선택된 아이템의 텍스트 데이터 받기
+            val selectedText = data?.getStringExtra("selectedItem")
+            Log.d("NoticeActivity", "Selected item: $selectedText")
+            // 예를 들어 UI 업데이트, 검색어 변경 등 원하는 처리를 수행
+        }
     }
 
     private fun initNotification() {
