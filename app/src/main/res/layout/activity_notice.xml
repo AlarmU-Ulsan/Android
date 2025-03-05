@@ -21,6 +21,36 @@
             android:layout_marginTop="25dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
+        
+        <LinearLayout
+            android:id="@+id/notice_select_btn_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="10dp"
+            android:paddingEnd="5dp"
+            android:gravity="center"
+            android:layout_marginStart="7dp"
+            app:layout_constraintStart_toEndOf="@id/notice_logo_iv"
+            app:layout_constraintTop_toTopOf="@id/notice_logo_iv"
+            app:layout_constraintBottom_toBottomOf="@id/notice_logo_iv">
+
+            <TextView
+                android:id="@+id/notice_selected_major_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IT융합전공"
+                android:textSize="15dp"
+                android:textColor="@color/black"/>
+            
+            <ImageView
+                android:layout_width="4.4dp"
+                android:layout_height="8.7dp"
+                android:src="@drawable/btn_right_arrow"
+                android:layout_marginStart="9dp"/>
+
+        </LinearLayout>
+
+
 
         <EditText
             android:id="@+id/notice_search_et"
@@ -130,15 +160,6 @@
                 android:layout_marginStart="6.5dp"/>
             
         </LinearLayout>
-        
-        <ImageView
-            android:id="@+id/notice_tab_major_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="26.6dp"
-            android:src="@drawable/btn_tab_it"
-            app:layout_constraintTop_toTopOf="@id/notice_tab_ll"
-            app:layout_constraintBottom_toBottomOf="@id/notice_tab_ll"
-            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
