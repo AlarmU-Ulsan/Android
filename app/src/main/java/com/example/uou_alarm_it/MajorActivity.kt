@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.uou_alarm_it.databinding.ActivityMajorBinding
 
-data class MajorItem(val title: String, val imageResId: Int)
-
 class MajorActivity : AppCompatActivity() {
+
+    inner class MajorItem(val title: String, val imageResId: Int)
 
     private lateinit var binding: ActivityMajorBinding
 
@@ -68,11 +68,13 @@ class MajorActivity : AppCompatActivity() {
         }
     }
 
+    private var majorLogos : ArrayList<Int> = arrayListOf(R.drawable.logo_ict, R.drawable.logo_it, R.drawable.logo_ai)
+
     private fun getMajorItems(): List<MajorItem> {
         return listOf(
-            MajorItem("ICT융합학부", R.drawable.logo_splash),
-            MajorItem("IT융합전공", R.drawable.logo_splash),
-            MajorItem("AI융합전공", R.drawable.logo_splash)
+            MajorItem("ICT융합학부", majorLogos[0]),
+            MajorItem("IT융합전공", majorLogos[1]),
+            MajorItem("AI융합전공", majorLogos[2])
             // 필요에 따라 추가
         )
     }

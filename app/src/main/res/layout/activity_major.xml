@@ -6,30 +6,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MajorActivity">
-    
-    <ImageView
+
+    <LinearLayout
         android:id="@+id/major_back_btn_iv"
-        android:layout_width="10dp"
-        android:layout_height="18dp"
-        android:src="@drawable/btn_previous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="51dp"
-        android:layout_marginStart="32dp"/>
+        android:layout_marginStart="32dp"
+        android:gravity="center">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="선택"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:layout_marginStart="18dp"
-        app:layout_constraintTop_toTopOf="@id/major_back_btn_iv"
-        app:layout_constraintBottom_toBottomOf="@id/major_back_btn_iv"
-        app:layout_constraintStart_toEndOf="@id/major_back_btn_iv"/>
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="18dp"
+            android:src="@drawable/btn_previous"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="전공선택"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginStart="18dp" />
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:visibility="gone"
         android:id="@+id/major_uou_cl"
         android:layout_width="match_parent"
         android:layout_height="0dp"

@@ -40,7 +40,8 @@
                 android:layout_height="wrap_content"
                 android:text="IT융합전공"
                 android:textSize="15dp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
             
             <ImageView
                 android:layout_width="4.4dp"
