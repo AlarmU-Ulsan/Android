@@ -12,7 +12,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/icon128"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/icon128"
+        android:roundIcon="@drawable/icon_beta"
         android:supportsRtl="true"
         android:theme="@style/Theme.UOUAlarmit">
         <activity
