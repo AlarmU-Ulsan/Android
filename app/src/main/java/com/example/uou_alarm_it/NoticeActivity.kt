@@ -453,6 +453,7 @@ class NoticeActivity : AppCompatActivity() {
                     binding.noticeCloseSearchCl.visibility = View.GONE
                     binding.noticeSearchIv.visibility = View.VISIBLE
                     binding.noticeSearchCl.visibility = View.VISIBLE
+                    binding.noticeSelectBtnLl.visibility = View.VISIBLE
                 }
                 override fun onAnimationEnd(p0: Animation?) {
                     binding.noticeNoticeIv.visibility = View.VISIBLE
@@ -479,6 +480,7 @@ class NoticeActivity : AppCompatActivity() {
                     binding.noticeCloseSearchCl.visibility = View.VISIBLE
                     binding.noticeSearchIv.visibility = View.GONE
                     binding.noticeSearchCl.visibility = View.GONE
+                    binding.noticeSelectBtnLl.visibility = View.GONE
                 }
                 override fun onAnimationEnd(p0: Animation?) {}
                 override fun onAnimationRepeat(p0: Animation?) {}

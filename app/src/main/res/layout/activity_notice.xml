@@ -40,7 +40,8 @@
                 android:layout_height="wrap_content"
                 android:text="IT융합전공"
                 android:textSize="15dp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
             
             <ImageView
                 android:layout_width="4.4dp"
@@ -83,10 +84,11 @@
 
         <ImageView
             android:id="@+id/notice_close_search_iv"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/close_search"
             android:visibility="gone"
+            android:layout_marginEnd="3dp"
             app:layout_constraintTop_toTopOf="@id/notice_search_et"
             app:layout_constraintBottom_toBottomOf="@id/notice_search_et"
             app:layout_constraintEnd_toEndOf="parent"/>
@@ -197,7 +199,7 @@
         android:layout_width="191.7dp"
         android:layout_height="115.5dp"
         android:src="@drawable/img_empty_logo"
-        app:layout_constraintTop_toTopOf="@id/notice_line_view"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

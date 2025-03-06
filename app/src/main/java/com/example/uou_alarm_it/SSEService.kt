@@ -81,8 +81,8 @@ class SSEService(context: Context) : BackgroundEventHandler {
 
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "SSE Notification Channel"
-            val descriptionText = "Channel for SSE notifications"
+            val name = "공지 알림"
+            val descriptionText = "공지 알림"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
@@ -95,7 +95,7 @@ class SSEService(context: Context) : BackgroundEventHandler {
     }
 
     val Icon128 = BitmapFactory.decodeResource(context.resources, R.drawable.icon128)
-
+    private val GROUP_KEY_NOTICES = "group_key_notices"
     // 알림을 생성하고 표시하는 메서드
     private fun showNotification(data: Notification, context: Context) {
         val intent = Intent(context, WebActivity::class.java).apply {
@@ -106,22 +106,39 @@ class SSEService(context: Context) : BackgroundEventHandler {
             context,
             0,  // requestCode
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-        val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.notice_icon)
-            .setLargeIcon(Icon128)
-            .setContentTitle("새로운 공지")  // 알림 제목
-            .setContentText(data.title)  // 알림 내용
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // 우선순위 설정
-            .setAutoCancel(true)  // 사용자가 알림을 클릭하면 자동으로 알림이 사라짐
-            .setContentIntent(pendingIntent)  // 알림 클릭 시 실행될 PendingIntent 설정
 
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        notificationManager.notify(0, notificationBuilder.build())  // 알림 표시
+        val notificationId = System.currentTimeMillis().toInt()
+
+        val summaryNotification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.notice_icon)
+            .setContentTitle("울산대학교 알림it")
+            .setStyle(NotificationCompat.InboxStyle()
+                .setSummaryText("공지 알림")
+            )
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setGroup(GROUP_KEY_NOTICES)  // 🔥 동일한 그룹 키
+            .setGroupSummary(true)  // 📌 요약 알림 활성화
+            .build()
+
+        notificationManager.notify(0, summaryNotification)  // 알림 표시
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.notice_icon)
+            .setLargeIcon(Icon128)
+            .setContentTitle("알림it")  // 알림 제목
+            .setContentText("새 공지가 올라왔어요! \""+data.title+"\"")  // 알림 내용
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // 우선순위 설정
+            .setAutoCancel(true)  // 사용자가 알림을 클릭하면 자동으로 알림이 사라짐
+            .setContentIntent(pendingIntent)  // 알림 클릭 시 실행될 PendingIntent 설정
+            .setGroup(GROUP_KEY_NOTICES)  // 🔥 그룹 키 설정
+            .build()
+
+        notificationManager.notify(notificationId, notification)
     }
 
     private fun retrySSEConnection() {
