@@ -152,6 +152,7 @@ class NoticeActivity : AppCompatActivity() {
             val intent = Intent(this, MajorActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_MAJOR)
         }
+        updateEmptyState()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -246,11 +247,13 @@ class NoticeActivity : AppCompatActivity() {
                 NoticeActivity.category = 1
                 binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_on)
                 initAllTab()
+                updateEmptyState()
             }
             0 -> {
                 NoticeActivity.category = 0
                 binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_on)
                 initImportantTab()
+                updateEmptyState()
             }
             3 -> {
                 NoticeActivity.category = 3
