@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.launchdarkly.eventsource.ConnectStrategy
 import com.launchdarkly.eventsource.EventSource
@@ -494,6 +495,33 @@ class NoticeActivity : AppCompatActivity() {
         }
     }
 
+    private fun getFcmToken(){
+        var token = ""
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
+                return@addOnCompleteListener
+            }
+            else {
+                token = task.result.toString()
+                Log.d("FCM", "FCM 토큰: $token")
+                RetrofitClient.service.postFCMRegister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
+                    override fun onResponse(
+                        call: Call<PostFCMRegisterResponse>,
+                        response: Response<PostFCMRegisterResponse>
+                    ) {
+                        Log.d("FCM", "FCM 연결 성공")
+                    }
+
+                    override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
+                        Log.e("FCM", "FCM 연결 실패" + t)
+                    }
+
+                })
+            }
+        }
+    }
+
     private fun connectNotification() {
         eventSource = BackgroundEventSource.Builder(
             SSEService(this),
@@ -506,6 +534,7 @@ class NoticeActivity : AppCompatActivity() {
             .threadPriority(Thread.MAX_PRIORITY)
             .build()
         eventSource?.start()
+        getFcmToken()
     }
 
     private fun unConnectNotification() {

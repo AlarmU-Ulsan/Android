@@ -2,6 +2,7 @@ package com.example.uou_alarm_it
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.uou_alarm_it.databinding.ActivitySplashBinding
 
@@ -20,4 +21,6 @@ class SplashActivity : AppCompatActivity() {
             finish()
         },2000)
     }
+
+
 }

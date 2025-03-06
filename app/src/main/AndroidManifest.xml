@@ -15,6 +15,13 @@
         android:roundIcon="@drawable/icon_beta"
         android:supportsRtl="true"
         android:theme="@style/Theme.UOUAlarmit">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notice_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/white" />
+
         <activity
             android:name=".MajorActivity"
             android:exported="false" />

@@ -1,5 +1,6 @@
 plugins {
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
@@ -72,4 +73,3 @@ dependencies {
     // FCM
     implementation 'com.google.firebase:firebase-messaging-ktx:23.0.0'
 }
-apply plugin: 'com.google.gms.google-services'
