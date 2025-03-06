@@ -69,6 +69,7 @@ class NoticeActivity : AppCompatActivity() {
         intent?.extras?.let{
             link = it.getString("link") ?:""
             if (link != "") {
+                Log.d("noticeFCM", link)
                 val intent = Intent(this, WebActivity::class.java).apply {
                     putExtra("url", link)  // 알림에 포함된 데이터 전송
                 }

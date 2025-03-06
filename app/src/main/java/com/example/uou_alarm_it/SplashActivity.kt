@@ -22,7 +22,7 @@ class SplashActivity : AppCompatActivity() {
         android.os.Handler().postDelayed({
             Log.d("splashFCM", link)
             val intent = Intent(this, NoticeActivity::class.java).apply {
-                putExtra("url", link)  // 알림에 포함된 데이터 전송
+                putExtra("link", link)  // 알림에 포함된 데이터 전송
             }
             startActivity(intent)
             finish()
