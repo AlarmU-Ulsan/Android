@@ -19,6 +19,8 @@ class SSEService(context: Context) : BackgroundEventHandler {
 
     private val CHANNEL_ID = "sse_channel_id"
     private val context = context
+    val Icon128 = BitmapFactory.decodeResource(context.resources, R.drawable.icon128)
+    private val GROUP_KEY_NOTICES = "group_key_notices"
 
     init {
         createNotificationChannel(context)
@@ -94,8 +96,6 @@ class SSEService(context: Context) : BackgroundEventHandler {
         }
     }
 
-    val Icon128 = BitmapFactory.decodeResource(context.resources, R.drawable.icon128)
-    private val GROUP_KEY_NOTICES = "group_key_notices"
     // 알림을 생성하고 표시하는 메서드
     private fun showNotification(data: Notification, context: Context) {
         val intent = Intent(context, WebActivity::class.java).apply {
