@@ -65,6 +65,17 @@ class NoticeActivity : AppCompatActivity() {
         // 뷰를 먼저 attach합니다.
         setContentView(binding.root)
 
+        var link = ""
+        intent?.extras?.let{
+            link = it.getString("link") ?:""
+            if (link != "") {
+                val intent = Intent(this, WebActivity::class.java).apply {
+                    putExtra("url", link)  // 알림에 포함된 데이터 전송
+                }
+                startActivity(intent)
+            }
+        }
+
         setting = loadSetting()
         bookmarkList = loadBookmarkList()
         bookmarkList.filter { it.type == "NOTICE" }.toCollection(bookmarkImportant)

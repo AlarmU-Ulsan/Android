@@ -17,19 +17,13 @@ class SplashActivity : AppCompatActivity() {
 
         intent?.extras?.let{
             link = it.getString("link") ?:""
-            Log.d("FCM", link)
         }
 
         android.os.Handler().postDelayed({
-            if (link != "") {
-                val intent = Intent(this, WebActivity::class.java).apply {
-                    putExtra("url", link)  // 알림에 포함된 데이터 전송
-                }
-                startActivity(intent)
-                finish()
+            Log.d("splashFCM", link)
+            val intent = Intent(this, NoticeActivity::class.java).apply {
+                putExtra("url", link)  // 알림에 포함된 데이터 전송
             }
-            val intent = Intent(this, NoticeActivity::class.java)
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             startActivity(intent)
             finish()
         },2000)
