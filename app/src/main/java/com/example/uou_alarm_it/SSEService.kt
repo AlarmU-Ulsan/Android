@@ -130,7 +130,7 @@ class SSEService(context: Context) : BackgroundEventHandler {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.notice_icon)
             .setContentTitle(data.title)  // 알림 제목
-            .setContentText("새 공지가 올라왔어요! \""+data.body+"\"")  // 알림 내용
+            .setContentText(data.body)  // 알림 내용
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // 우선순위 설정
             .setAutoCancel(true)  // 사용자가 알림을 클릭하면 자동으로 알림이 사라짐
             .setContentIntent(pendingIntent)  // 알림 클릭 시 실행될 PendingIntent 설정
