@@ -24,4 +24,10 @@ interface RetrofitService {
         @Query("token") token: String,
         @Query("major") major: String
     ): Call<PostFCMRegisterResponse>
+
+    @DELETE("/fcm/unregister")
+    fun deleteFCMUnregister(
+        @Query("token") token: String,
+        @Query("major") major: String
+    ): Call<PostFCMRegisterResponse>
 }

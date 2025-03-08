@@ -533,6 +533,32 @@ class NoticeActivity : AppCompatActivity() {
             }
         }
     }
+    private fun deleteFCMToken() {
+        var token = ""
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
+                return@addOnCompleteListener
+            }
+            else {
+                token = task.result.toString()
+                Log.d("FCM", "FCM 토큰: $token")
+                RetrofitClient.service.deleteFCMUnregister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
+                    override fun onResponse(
+                        call: Call<PostFCMRegisterResponse>,
+                        response: Response<PostFCMRegisterResponse>
+                    ) {
+                        Log.d("FCM", "FCM 연결 해제 성공")
+                    }
+
+                    override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
+                        Log.e("FCM", "FCM 연결 해제 실패" + t)
+                    }
+
+                })
+            }
+        }
+    }
 
     private fun connectNotification() {
         eventSource = BackgroundEventSource.Builder(
@@ -557,6 +583,7 @@ class NoticeActivity : AppCompatActivity() {
         } finally {
             eventSource = null
         }
+        deleteFCMToken()
     }
 
     fun saveSetting(setting: Setting) {
