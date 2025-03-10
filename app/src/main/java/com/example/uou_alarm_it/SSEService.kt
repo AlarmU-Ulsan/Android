@@ -19,6 +19,8 @@ class SSEService(context: Context) : BackgroundEventHandler {
 
     private val CHANNEL_ID = "sse_channel_id"
     private val context = context
+    val Icon128 = BitmapFactory.decodeResource(context.resources, R.drawable.icon128)
+    private val GROUP_KEY_NOTICES = "group_key_notices"
 
     init {
         createNotificationChannel(context)
@@ -94,8 +96,6 @@ class SSEService(context: Context) : BackgroundEventHandler {
         }
     }
 
-    val Icon128 = BitmapFactory.decodeResource(context.resources, R.drawable.icon128)
-    private val GROUP_KEY_NOTICES = "group_key_notices"
     // 알림을 생성하고 표시하는 메서드
     private fun showNotification(data: Notification, context: Context) {
         val intent = Intent(context, WebActivity::class.java).apply {
@@ -129,9 +129,8 @@ class SSEService(context: Context) : BackgroundEventHandler {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.notice_icon)
-            .setLargeIcon(Icon128)
-            .setContentTitle("알림it")  // 알림 제목
-            .setContentText("새 공지가 올라왔어요! \""+data.title+"\"")  // 알림 내용
+            .setContentTitle(data.title)  // 알림 제목
+            .setContentText(data.body)  // 알림 내용
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // 우선순위 설정
             .setAutoCancel(true)  // 사용자가 알림을 클릭하면 자동으로 알림이 사라짐
             .setContentIntent(pendingIntent)  // 알림 클릭 시 실행될 PendingIntent 설정

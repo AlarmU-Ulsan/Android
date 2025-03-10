@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.uou_alarm_it.databinding.ActivityNoticeBinding
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.launchdarkly.eventsource.ConnectStrategy
 import com.launchdarkly.eventsource.EventSource
@@ -63,6 +64,18 @@ class NoticeActivity : AppCompatActivity() {
         binding = ActivityNoticeBinding.inflate(layoutInflater)
         // 뷰를 먼저 attach합니다.
         setContentView(binding.root)
+
+        var link = ""
+        intent?.extras?.let{
+            link = it.getString("link") ?:""
+            if (link != "") {
+                Log.d("noticeFCM", link)
+                val intent = Intent(this, WebActivity::class.java).apply {
+                    putExtra("url", link)  // 알림에 포함된 데이터 전송
+                }
+                startActivity(intent)
+            }
+        }
 
         setting = loadSetting()
         bookmarkList = loadBookmarkList()
@@ -152,6 +165,7 @@ class NoticeActivity : AppCompatActivity() {
             val intent = Intent(this, MajorActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_MAJOR)
         }
+        updateEmptyState()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -246,11 +260,13 @@ class NoticeActivity : AppCompatActivity() {
                 NoticeActivity.category = 1
                 binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_on)
                 initAllTab()
+                updateEmptyState()
             }
             0 -> {
                 NoticeActivity.category = 0
                 binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_on)
                 initImportantTab()
+                updateEmptyState()
             }
             3 -> {
                 NoticeActivity.category = 3
@@ -491,6 +507,59 @@ class NoticeActivity : AppCompatActivity() {
         }
     }
 
+    private fun getFcmToken(){
+        var token = ""
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
+                return@addOnCompleteListener
+            }
+            else {
+                token = task.result.toString()
+                Log.d("FCM", "FCM 토큰: $token")
+                RetrofitClient.service.postFCMRegister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
+                    override fun onResponse(
+                        call: Call<PostFCMRegisterResponse>,
+                        response: Response<PostFCMRegisterResponse>
+                    ) {
+                        Log.d("FCM", "FCM 연결 성공")
+                    }
+
+                    override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
+                        Log.e("FCM", "FCM 연결 실패" + t)
+                    }
+
+                })
+            }
+        }
+    }
+    private fun deleteFCMToken() {
+        var token = ""
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
+                return@addOnCompleteListener
+            }
+            else {
+                token = task.result.toString()
+                Log.d("FCM", "FCM 토큰: $token")
+                RetrofitClient.service.deleteFCMUnregister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
+                    override fun onResponse(
+                        call: Call<PostFCMRegisterResponse>,
+                        response: Response<PostFCMRegisterResponse>
+                    ) {
+                        Log.d("FCM", "FCM 연결 해제 성공")
+                    }
+
+                    override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
+                        Log.e("FCM", "FCM 연결 해제 실패" + t)
+                    }
+
+                })
+            }
+        }
+    }
+
     private fun connectNotification() {
         eventSource = BackgroundEventSource.Builder(
             SSEService(this),
@@ -503,6 +572,7 @@ class NoticeActivity : AppCompatActivity() {
             .threadPriority(Thread.MAX_PRIORITY)
             .build()
         eventSource?.start()
+        getFcmToken()
     }
 
     private fun unConnectNotification() {
@@ -513,6 +583,7 @@ class NoticeActivity : AppCompatActivity() {
         } finally {
             eventSource = null
         }
+        deleteFCMToken()
     }
 
     fun saveSetting(setting: Setting) {
