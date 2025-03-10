@@ -10,6 +10,16 @@
         android:layout_height="match_parent"/>
 
     <ImageView
+        android:id="@+id/web_back_btn_iv"
+        android:layout_width="39dp"
+        android:layout_height="43dp"
+        android:src="@drawable/btn_web_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="91dp"
+        android:layout_marginStart="30dp"/>
+
+    <ImageView
         android:id="@+id/web_link_btn_iv"
         android:layout_width="115dp"
         android:layout_height="42dp"

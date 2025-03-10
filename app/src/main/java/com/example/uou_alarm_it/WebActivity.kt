@@ -24,6 +24,10 @@ class WebActivity : AppCompatActivity(){
 
         binding.webWebviewWv.loadUrl(url)
 
+        binding.webBackBtnIv.setOnClickListener {
+            finish()
+        }
+
         binding.webLinkBtnIv.setOnClickListener {
             val browserIntent  = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(browserIntent)
