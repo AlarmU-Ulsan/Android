@@ -43,6 +43,10 @@ class NoticeRVAdapter() : RecyclerView.Adapter<NoticeRVAdapter.ViewHolder>() {
             // type이 "NOTICE"이면 표시, 아니면 숨김
             if (notice.type == "NOTICE") {
                 binding.itemNoticeImportMarkIv.visibility = View.VISIBLE
+                binding.itemNoticeImportMarkIv.setImageResource(R.drawable.import_mark)
+            } else if (notice.type == "NECESSARY") {
+                binding.itemNoticeImportMarkIv.visibility = View.VISIBLE
+                binding.itemNoticeImportMarkIv.setImageResource(R.drawable.necessary_mark)
             } else {
                 binding.itemNoticeImportMarkIv.visibility = View.GONE
             }
