@@ -46,10 +46,9 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface {
                         },2000)
                     } else {
                         // 버전이 최신 버전이 아닐 때, 업데이트 다이얼로그 띄우기
-                        // url 설정 필요
-//                        val url = response.body()!!.result.url
+                        val link = response.body()!!.result.link
                         val lastVersion = response.body()!!.result.latestVersion
-                        val dialog = UpdateDialog(this@SplashActivity, "https://www.naver.com", lastVersion, version)
+                        val dialog = UpdateDialog(this@SplashActivity, link, lastVersion, version)
                         dialog.isCancelable = false
                         dialog.show(this@SplashActivity.supportFragmentManager, "UpdateDialog")
                     }
