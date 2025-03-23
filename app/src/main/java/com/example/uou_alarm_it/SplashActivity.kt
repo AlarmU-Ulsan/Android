@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.uou_alarm_it.databinding.ActivitySplashBinding
+import com.google.firebase.BuildConfig
 
 class SplashActivity : AppCompatActivity() {
     lateinit var binding : ActivitySplashBinding
@@ -14,6 +15,10 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
         var link = ""
+
+        val version = BuildConfig.VERSION_NAME
+        binding.splashVersionTv.text = version.toString()
+
 
         intent?.extras?.let{
             link = it.getString("link") ?:""
