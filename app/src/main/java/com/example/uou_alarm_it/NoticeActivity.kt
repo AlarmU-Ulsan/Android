@@ -44,7 +44,7 @@ class NoticeActivity : AppCompatActivity() {
     var bookmarkCommon: HashSet<Notice> = hashSetOf()
 
     var keyWord: String = ""
-    var major: String = "IT융합전공"
+    var major: String = "ICT융합학부"
 
     lateinit var setting: Setting
 
@@ -77,7 +77,12 @@ class NoticeActivity : AppCompatActivity() {
             }
         }
 
+        // 알림 설정, 학과 설정 불러오기
         setting = loadSetting()
+        major = setting.notificationMajor
+        binding.noticeSelectedMajorTv.text = major
+
+
         bookmarkList = loadBookmarkList()
         bookmarkList.filter { it.type == "NOTICE" }.toCollection(bookmarkImportant)
         bookmarkList.filter { it.type == "COMMON" }.toCollection(bookmarkCommon)
@@ -158,6 +163,7 @@ class NoticeActivity : AppCompatActivity() {
 
         binding.noticeNoticeCl.setOnClickListener {
             setting.notificationSetting = !setting.notificationSetting
+            setting.notificationMajor = major
             saveSetting(setting)
             initNotification()
         }
@@ -177,6 +183,8 @@ class NoticeActivity : AppCompatActivity() {
             binding.noticeSelectedMajorTv.text = selectedText
             if (!selectedText.isNullOrEmpty()) {
                 major = selectedText
+                setting.notificationMajor = major
+                saveSetting(setting)
                 unConnectNotification()
                 connectNotification()
             }
@@ -602,7 +610,7 @@ class NoticeActivity : AppCompatActivity() {
         return if (json != null) {
             gson.fromJson(json, Setting::class.java)
         } else {
-            Setting(true)
+            Setting(true, "ICT융합학부")
         }
     }
 }
