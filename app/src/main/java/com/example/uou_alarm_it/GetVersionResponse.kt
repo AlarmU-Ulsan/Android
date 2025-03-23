@@ -11,6 +11,6 @@ data class GetVersionResponse(
         val platform: String,
         val latestVersion: String,
         val minimumVersion: String,
-//        val url: String
+        val link: String
     )
 }
