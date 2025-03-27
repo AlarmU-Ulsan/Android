@@ -168,7 +168,7 @@ class NoticeActivity : AppCompatActivity() {
             initNotification()
         }
         binding.noticeSelectBtnLl.setOnClickListener {
-            val intent = Intent(this, MajorActivity::class.java)
+            val intent = Intent(this, FirstNoticeChoiceActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_MAJOR)
         }
         updateEmptyState()
