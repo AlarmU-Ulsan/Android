@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".FirstAlarmChoiceActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="30dp">
+
+        <TextView
+            android:id="@+id/first_alarm_back_btn_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="전공선택"
+            android:textColor="@color/green_70"
+            android:textSize="15dp"
+            android:letterSpacing="-0.032"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="88dp"
+            android:layout_marginStart="-5dp"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/first_alarm_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="공지알림을 받을 전공을\n선택해주세요!"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:letterSpacing="-0.032"
+            android:textColor="@color/black"
+            android:layout_marginTop="134dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/first_alarm_notice_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="새로운 공지가 올라오면 알림을 보내드려요\n알림채널은 언제든지 또 변경할 수 있어요"
+            android:textSize="12dp"
+            android:letterSpacing="-0.026"
+            app:layout_constraintTop_toBottomOf="@id/first_alarm_title_tv"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="다음"
+            android:textSize="15dp"
+            android:textColor="@color/green_70"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/first_alarm_title_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="5dp"/>
+
+        <EditText
+            android:id="@+id/first_alarm_search_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bottom_line"
+            android:textColor="@color/black"
+            android:hint="알림 받을 학과를 입력해주세요"
+            android:textColorHint="#A3A3A3"
+            android:textSize="15dp"
+            android:letterSpacing="-0.032"
+            app:layout_constraintTop_toBottomOf="@id/first_alarm_notice_tv"
+            android:layout_marginTop="50dp"/>
+
+        <TextView
+            android:id="@+id/first_alarm_search_btn_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="검색"
+            android:textSize="15dp"
+            android:textColor="@color/green_70"
+            android:padding="5dp"
+            app:layout_constraintTop_toTopOf="@id/first_alarm_search_et"
+            app:layout_constraintBottom_toBottomOf="@id/first_alarm_search_et"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/first_alarm_choice_college_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/first_alarm_search_et"
+            android:layout_marginTop="63dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

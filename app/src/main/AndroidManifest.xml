@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UOUAlarmit">
         <activity
+            android:name=".FirstAlarmChoiceActivity"
+            android:exported="false" />
+        <activity
             android:name=".FirstNoticeChoiceActivity"
             android:exported="false" />
 

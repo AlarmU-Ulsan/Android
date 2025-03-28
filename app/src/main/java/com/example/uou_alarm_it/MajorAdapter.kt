@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 
 class MajorAdapter(
     private val majorList: List<Major>,
-    // 클릭 시 선택된 Major를 전달하는 콜백
     private val onMajorClick: (Major) -> Unit
 ) : RecyclerView.Adapter<MajorAdapter.MajorViewHolder>() {
 
