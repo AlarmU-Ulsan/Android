@@ -36,6 +36,7 @@
             app:layout_constraintStart_toStartOf="parent"/>
 
         <TextView
+            android:id="@+id/first_notice_next_btn_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="다음"
@@ -44,7 +45,9 @@
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="@id/first_notice_title_tv"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="-5dp"
+            android:layout_marginEnd="-10dp"
+            android:padding="10dp"/>
 
         <EditText
             android:id="@+id/first_notice_search_et"

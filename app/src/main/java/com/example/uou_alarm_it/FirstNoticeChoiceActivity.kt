@@ -1,5 +1,6 @@
 package com.example.uou_alarm_it
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.uou_alarm_it.NoticeActivity.Companion.REQUEST_CODE_MAJOR
 import com.example.uou_alarm_it.databinding.ActivityFirstNoticeChoiceBinding
 
 class FirstNoticeChoiceActivity : AppCompatActivity() {
@@ -47,6 +49,11 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
         binding.firstNoticeChoiceCollegeRv.apply {
             layoutManager = LinearLayoutManager(this@FirstNoticeChoiceActivity)
             adapter = collegeAdapter
+        }
+
+        binding.firstNoticeNextBtnTv.setOnClickListener {
+            val intent = Intent(this, FirstAlarmChoiceActivity::class.java)
+            startActivity(intent)
         }
 
         // 검색 EditText에 TextWatcher 추가

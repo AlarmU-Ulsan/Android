@@ -1,5 +1,6 @@
 package com.example.uou_alarm_it
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -53,6 +54,15 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         binding.firstAlarmChoiceCollegeRv.apply {
             layoutManager = LinearLayoutManager(this@FirstAlarmChoiceActivity)
             adapter = collegeAdapter
+        }
+
+        binding.firstAlarmBackBtnTv.setOnClickListener {
+            finish()
+        }
+
+        binding.firstAlarmNextBtnTv.setOnClickListener {
+            val intent = Intent(this, NoticeActivity::class.java)
+            startActivity(intent)
         }
 
         // 검색 EditText에 TextWatcher 추가
