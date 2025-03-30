@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 전체 배경을 투명으로 설정 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+
+    <!-- 아래쪽에 굵기 2dp의 사각형 배치 -->
+    <item
+        android:left="0dp"
+        android:right="0dp"
+        android:bottom="0dp"
+        android:top="?android:attr/listPreferredItemHeightSmall">
+        <shape android:shape="rectangle">
+            <size android:height="2dp"/>  <!-- 하단 선 두께를 2dp로 -->
+            <solid android:color="@color/green_70"/>
+        </shape>
+    </item>
+</layer-list>
