@@ -44,7 +44,7 @@ class NoticeActivity : AppCompatActivity() {
     var bookmarkCommon: HashSet<Notice> = hashSetOf()
 
     var keyWord: String = ""
-    var major: String = "ICT융합학부"
+    var major: String = "ICT융합학부" // 기본값
 
     lateinit var setting: Setting
 
@@ -62,27 +62,58 @@ class NoticeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNoticeBinding.inflate(layoutInflater)
-        // 뷰를 먼저 attach합니다.
         setContentView(binding.root)
 
+        // 알림 링크 처리 (생략)
         var link = ""
-        intent?.extras?.let{
-            link = it.getString("link") ?:""
-            if (link != "") {
-                Log.d("noticeFCM", link)
-                val intent = Intent(this, WebActivity::class.java).apply {
-                    putExtra("url", link)  // 알림에 포함된 데이터 전송
+        intent.extras?.let {
+            link = it.getString("link") ?: ""
+            if (link.isNotEmpty()) {
+                Log.d("NoticeActivity", "알림 링크: $link")
+                val webIntent = Intent(this, WebActivity::class.java).apply {
+                    putExtra("url", link)
                 }
-                startActivity(intent)
+                startActivity(webIntent)
             }
         }
 
-        // 알림 설정, 학과 설정 불러오기
+        // 기존 저장된 Setting을 불러옵니다.
         setting = loadSetting()
-        major = setting.notificationMajor
+
+        // SharedPreferences에서 "selected_major"와 최초 실행 플래그("isFirstNoticeRun")를 읽어옵니다.
+        val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        val spMajor = sharedPref.getString("selected_major", null)
+        val isFirstRun = sharedPref.getBoolean("isFirstNoticeRun", true)
+        val defaultMajor = "ICT융합학부"
+
+        // Intent extra "major" 값
+        val intentMajor = intent.getStringExtra("major")
+
+        // 로그로 값 확인
+        Log.d("NoticeActivity", "=== 초기 로그 ===")
+        Log.d("NoticeActivity", "isFirstRun: $isFirstRun")
+        Log.d("NoticeActivity", "SharedPreferences selected_major: $spMajor")
+        Log.d("NoticeActivity", "Setting.notificationMajor: ${setting.notificationMajor}")
+        Log.d("NoticeActivity", "Intent extra major: $intentMajor")
+
+        // 최초 실행 시에만 Intent extra "major"를 적용하고 플래그를 false로 업데이트
+        major = if (isFirstRun && !intentMajor.isNullOrEmpty() && setting.notificationMajor == defaultMajor) {
+            sharedPref.edit().putString("selected_major", intentMajor)
+                .putBoolean("isFirstNoticeRun", false)
+                .apply()
+            intentMajor
+        } else {
+            spMajor ?: setting.notificationMajor
+        }
+
+        // 업데이트된 major 값을 Setting에 반영하고 저장
+        setting.notificationMajor = major
+        saveSetting(setting)
+
+        Log.d("NoticeActivity", "최종 major 값: $major")
         binding.noticeSelectedMajorTv.text = major
 
-
+        // 즐겨찾기 리스트 불러오기 등 나머지 로직은 그대로 진행합니다.
         bookmarkList = loadBookmarkList()
         bookmarkList.filter { it.type == "NOTICE" }.toCollection(bookmarkImportant)
         bookmarkList.filter { it.type == "COMMON" }.toCollection(bookmarkCommon)
@@ -90,26 +121,18 @@ class NoticeActivity : AppCompatActivity() {
 
         initAllTab()
 
-        binding.noticeTabAllIv.setOnClickListener {
-            setCategory(1)
-        }
-        binding.noticeTabImportIv.setOnClickListener {
-            setCategory(0)
-        }
-        binding.noticeTabBookmarkIv.setOnClickListener {
-            setCategory(3)
-        }
+        binding.noticeTabAllIv.setOnClickListener { setCategory(1) }
+        binding.noticeTabImportIv.setOnClickListener { setCategory(0) }
+        binding.noticeTabBookmarkIv.setOnClickListener { setCategory(3) }
 
         binding.noticeSearchCl.setOnClickListener {
             if (binding.noticeSearchEt.visibility == View.GONE) {
                 animSearch()
             } else {
                 noticeSearch(binding.noticeSearchEt.text.toString())
-
                 binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_on)
                 binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_off)
                 binding.noticeTabBookmarkIv.setImageResource(R.drawable.btn_tab_bookmark_off)
-
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
                     .hideSoftInputFromWindow(binding.noticeSearchEt.windowToken, 0)
             }
@@ -118,14 +141,11 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeSearchEt.setOnKeyListener { view, i, keyEvent ->
             if (keyEvent.action == KeyEvent.ACTION_DOWN && i == KEYCODE_ENTER) {
                 noticeSearch(binding.noticeSearchEt.text.toString())
-
                 binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_on)
                 binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_off)
                 binding.noticeTabBookmarkIv.setImageResource(R.drawable.btn_tab_bookmark_off)
-
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
                     .hideSoftInputFromWindow(view.windowToken, 0)
-
                 return@setOnKeyListener true
             }
             false
@@ -136,9 +156,8 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeSearchEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString()
-                // 검색어가 비면 기본 조회로 복원
-                if(query.isEmpty()){
-                    when(category){
+                if (query.isEmpty()) {
+                    when (category) {
                         1 -> initAllTab()
                         0 -> initImportantTab()
                         3 -> {
@@ -155,9 +174,7 @@ class NoticeActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        binding.noticeCloseSearchIv.setOnClickListener {
-            animSearch()
-        }
+        binding.noticeCloseSearchIv.setOnClickListener { animSearch() }
 
         initNotification()
 
@@ -177,7 +194,6 @@ class NoticeActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_MAJOR && resultCode == RESULT_OK) {
-            // MajorActivity에서 전달한 선택된 아이템의 텍스트 데이터 받기
             val selectedText = data?.getStringExtra("selectedItem")
             Log.d("NoticeActivity", "Selected item: $selectedText")
             binding.noticeSelectedMajorTv.text = selectedText
@@ -185,10 +201,13 @@ class NoticeActivity : AppCompatActivity() {
                 major = selectedText
                 setting.notificationMajor = major
                 saveSetting(setting)
+                // 추가: SharedPreferences "selected_major" 값도 업데이트
+                val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+                sharedPref.edit().putString("selected_major", major).apply()
+
                 unConnectNotification()
                 connectNotification()
             }
-            // 현재 탭(모든 API 호출 함수들에서 major 변수 사용)이 다시 새로고침되도록 재설정
             setCategory(category)
         }
     }
@@ -214,16 +233,14 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun initAllTab() {
-        // 탭이 변경될 때 페이지와 리스트 초기화
         page = 0
         noticeList.clear()
-
         RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
                     noticeList.addAll(res.content)
-                    initRV()  // RecyclerView 어댑터를 초기화해서 화면에 첫 페이지 데이터를 표시
+                    initRV()
                     updateEmptyState()
                 }
             }
@@ -234,16 +251,14 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun initImportantTab() {
-        // 중요 탭일 경우에도 동일하게 한 페이지만 초기 로딩
         page = 0
         noticeList.clear()
-
         RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
                     noticeList.addAll(res.content.filter { it.type == "NOTICE" })
-                    initRV()  // RecyclerView 초기화
+                    initRV()
                     updateEmptyState()
                 }
             }
@@ -257,12 +272,10 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeTabAllIv.setImageResource(R.drawable.btn_tab_all_off)
         binding.noticeTabImportIv.setImageResource(R.drawable.btn_tab_import_off)
         binding.noticeTabBookmarkIv.setImageResource(R.drawable.btn_tab_bookmark_off)
-
         if (category != NoticeActivity.category) {
             noticeList = arrayListOf()
             page = 0
         }
-
         when (category) {
             1 -> {
                 NoticeActivity.category = 1
@@ -297,7 +310,6 @@ class NoticeActivity : AppCompatActivity() {
                 intent.putExtra("url", notice.link)
                 this@NoticeActivity.startActivity(intent)
             }
-
             override fun onBookmarkClick(notice: Notice) {
                 Log.d("test", "Bookmark")
                 if (notice in bookmarkList) {
@@ -322,10 +334,8 @@ class NoticeActivity : AppCompatActivity() {
         })
         binding.noticeRv.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                // 스크롤이 멈췄을 때 (IDLE 상태) 처리하도록 변경
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     if (category == 4) {
-                        // 검색 탭의 경우
                         if (!binding.noticeRv.canScrollVertically(-1)) {
                             Log.d("Paging", "Top of list")
                         } else if (!binding.noticeRv.canScrollVertically(1)) {
@@ -342,14 +352,10 @@ class NoticeActivity : AppCompatActivity() {
                                 isLoading = true
                                 RetrofitClient.service.getNotice(category, page++, major)
                                     .enqueue(object : Callback<GetNoticeResponse> {
-                                        override fun onResponse(
-                                            call: Call<GetNoticeResponse>,
-                                            response: Response<GetNoticeResponse>
-                                        ) {
+                                        override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                                             isLoading = false
                                             if (response.body()?.code == "COMMON200") {
                                                 val res = response.body()!!.result
-                                                // 만약 중요 탭(category == 0)이라면 type이 "NOTICE"인 항목만 추가
                                                 val newItems = if (category == 0) {
                                                     res.content.filter { it.type == "NOTICE" }
                                                 } else {
@@ -398,16 +404,12 @@ class NoticeActivity : AppCompatActivity() {
 
     private fun noticeSearch(keyword: String) {
         Log.d("Notice Search", keyword)
-
-        // 만약 이전 검색어와 달라졌다면 리스트와 페이지를 초기화
         if (keyWord != keyword) {
             noticeList = arrayListOf()
             keyWord = keyword
             page = 0
             initRV()
         }
-
-        // 검색어가 비었으면 현재 탭의 기본 조회로 복원
         if (keyword.isEmpty()) {
             when (NoticeActivity.category) {
                 1 -> initAllTab()
@@ -420,8 +422,6 @@ class NoticeActivity : AppCompatActivity() {
             }
             return
         }
-
-        // 북마크 탭일 경우, 로컬 필터링 진행
         if (NoticeActivity.category == 3) {
             val filtered = bookmarkList.filter {
                 it.title.contains(keyword, ignoreCase = true)
@@ -431,18 +431,13 @@ class NoticeActivity : AppCompatActivity() {
             updateEmptyState()
             return
         }
-
-        // 이미 로딩 중이면 중복 호출 방지
         if (isLoading) return
         isLoading = true
-
-        // 전체 탭(1)와 중요 탭(0)의 경우 API 호출
         RetrofitClient.service.getSearch(keyword, major, page++).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 isLoading = false
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
-                    // 중요 탭이면 type이 "NOTICE"인 게시물만 선택
                     val newItems = if (NoticeActivity.category == 0) {
                         res.content.filter { it.type == "NOTICE" }
                     } else {
@@ -484,7 +479,6 @@ class NoticeActivity : AppCompatActivity() {
                     binding.noticeNoticeCl.visibility = View.VISIBLE
                     binding.noticeSearchEt.visibility = View.GONE
                     binding.noticeSearchEt.setText("")
-                    // 검색 취소 시 기본 조회로 복원 (예: AllTab, 카테고리 1)
                     if (category == 4) {
                         setCategory(1)
                     }
@@ -521,8 +515,7 @@ class NoticeActivity : AppCompatActivity() {
             if (!task.isSuccessful) {
                 Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
                 return@addOnCompleteListener
-            }
-            else {
+            } else {
                 token = task.result.toString()
                 Log.d("FCM", "FCM 토큰: $token")
                 RetrofitClient.service.postFCMRegister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
@@ -532,23 +525,20 @@ class NoticeActivity : AppCompatActivity() {
                     ) {
                         Log.d("FCM", "FCM 연결 성공")
                     }
-
                     override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
                         Log.e("FCM", "FCM 연결 실패" + t)
                     }
-
                 })
             }
         }
     }
-    private fun deleteFCMToken() {
+    private fun deleteFcmToken() {
         var token = ""
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
                 return@addOnCompleteListener
-            }
-            else {
+            } else {
                 token = task.result.toString()
                 Log.d("FCM", "FCM 토큰: $token")
                 RetrofitClient.service.deleteFCMUnregister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
@@ -558,16 +548,13 @@ class NoticeActivity : AppCompatActivity() {
                     ) {
                         Log.d("FCM", "FCM 연결 해제 성공")
                     }
-
                     override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
                         Log.e("FCM", "FCM 연결 해제 실패" + t)
                     }
-
                 })
             }
         }
     }
-
     private fun connectNotification() {
         eventSource = BackgroundEventSource.Builder(
             SSEService(this),
@@ -582,7 +569,6 @@ class NoticeActivity : AppCompatActivity() {
         eventSource?.start()
         getFcmToken()
     }
-
     private fun unConnectNotification() {
         try {
             eventSource?.close()
@@ -591,9 +577,8 @@ class NoticeActivity : AppCompatActivity() {
         } finally {
             eventSource = null
         }
-        deleteFCMToken()
+        deleteFcmToken()
     }
-
     fun saveSetting(setting: Setting) {
         val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -602,7 +587,6 @@ class NoticeActivity : AppCompatActivity() {
         editor.putString("Setting", json)
         editor.apply()
     }
-
     fun loadSetting(): Setting {
         val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
         val gson = Gson()

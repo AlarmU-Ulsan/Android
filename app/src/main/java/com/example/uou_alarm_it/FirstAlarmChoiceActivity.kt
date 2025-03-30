@@ -63,6 +63,7 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         binding.firstAlarmNextBtnTv.setOnClickListener {
             val intent = Intent(this, NoticeActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         // 검색 EditText에 TextWatcher 추가

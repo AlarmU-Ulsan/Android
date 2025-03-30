@@ -1,9 +1,11 @@
 package com.example.uou_alarm_it
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -33,6 +35,9 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
     // 상위 RecyclerView 어댑터
     private lateinit var collegeAdapter: CollegeAdapter
 
+    // 사용자가 선택한 전공명을 저장하는 변수
+    private var selectedMajorName: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFirstNoticeChoiceBinding.inflate(layoutInflater)
@@ -51,9 +56,25 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
             adapter = collegeAdapter
         }
 
+        // "다음" 버튼 클릭 시, 선택한 전공명을 Intent extra로 전달하며 FirstAlarmChoiceActivity 실행
         binding.firstNoticeNextBtnTv.setOnClickListener {
+            var selectedMajor: String? = null
+            originalCollegeList.forEach { college ->
+                college.majors.forEach { major ->
+                    if (major.isChecked) {
+                        selectedMajor = major.majorName
+                    }
+                }
+            }
+            if (selectedMajor.isNullOrEmpty()) {
+                // 선택된 항목이 없으면 기본값(첫 전공)을 사용
+                selectedMajor = originalCollegeList.firstOrNull()?.majors?.firstOrNull()?.majorName ?: ""
+            }
+            val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+            sharedPref.edit().putString("selected_major", selectedMajor).apply()
             val intent = Intent(this, FirstAlarmChoiceActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         // 검색 EditText에 TextWatcher 추가
@@ -68,16 +89,12 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
 
     // 전공 선택 시, 전체 전공의 선택 상태를 업데이트하여 하나만 선택되도록 함
     private fun onMajorSelected(selectedMajor: Major) {
-        // 원본 전체 전공을 순회하며 모두 false로 설정
         originalCollegeList.forEach { college ->
             college.majors.forEach { major ->
                 major.isChecked = false
             }
         }
-        // 선택된 전공만 true로 변경
         selectedMajor.isChecked = true
-
-        // 필터링된 리스트도 동일 객체를 참조하므로 업데이트됨
         collegeAdapter.notifyDataSetChanged()
     }
 
