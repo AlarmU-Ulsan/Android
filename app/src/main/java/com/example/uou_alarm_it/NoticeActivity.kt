@@ -126,7 +126,7 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeTabBookmarkIv.setOnClickListener { setCategory(3) }
 
         binding.noticeSearchCl.setOnClickListener {
-            if (binding.noticeSearchEt.visibility == View.GONE) {
+            if (binding.noticeSearchBarCl.visibility == View.GONE) {
                 animSearch()
             } else {
                 noticeSearch(binding.noticeSearchEt.text.toString())
@@ -464,7 +464,7 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun animSearch() {
-        if (binding.noticeSearchEt.visibility == View.VISIBLE) {
+        if (binding.noticeSearchBarCl.visibility == View.VISIBLE) {
             val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_close)
             animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
@@ -472,12 +472,11 @@ class NoticeActivity : AppCompatActivity() {
                     binding.noticeCloseSearchCl.visibility = View.GONE
                     binding.noticeSearchIv.visibility = View.VISIBLE
                     binding.noticeSearchCl.visibility = View.VISIBLE
-                    binding.noticeSelectBtnLl.visibility = View.VISIBLE
                 }
                 override fun onAnimationEnd(p0: Animation?) {
-                    binding.noticeNoticeIv.visibility = View.VISIBLE
-                    binding.noticeNoticeCl.visibility = View.VISIBLE
-                    binding.noticeSearchEt.visibility = View.GONE
+                    binding.noticeSearchBarCl.visibility = View.GONE
+                    binding.noticeTabLl.visibility = View.VISIBLE
+                    binding.noticeLineView.visibility = View.VISIBLE
                     binding.noticeSearchEt.setText("")
                     if (category == 4) {
                         setCategory(1)
@@ -491,20 +490,19 @@ class NoticeActivity : AppCompatActivity() {
             val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_open)
             animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
-                    binding.noticeSearchEt.visibility = View.VISIBLE
-                    binding.noticeNoticeIv.visibility = View.GONE
-                    binding.noticeNoticeCl.visibility = View.GONE
+                    binding.noticeSearchBarCl.visibility = View.VISIBLE
                     binding.noticeCloseSearchIv.visibility = View.VISIBLE
                     binding.noticeCloseSearchCl.visibility = View.VISIBLE
                     binding.noticeSearchIv.visibility = View.GONE
                     binding.noticeSearchCl.visibility = View.GONE
-                    binding.noticeSelectBtnLl.visibility = View.GONE
+                    binding.noticeTabLl.visibility = View.GONE
+                    binding.noticeLineView.visibility = View.GONE
                 }
                 override fun onAnimationEnd(p0: Animation?) {}
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
-            binding.noticeSearchEt.visibility = View.VISIBLE
-            binding.noticeSearchEt.startAnimation(animation)
+            binding.noticeSearchBarCl.visibility = View.VISIBLE
+            binding.noticeSearchBarCl.startAnimation(animation)
             Log.d("anim", "open")
         }
     }
