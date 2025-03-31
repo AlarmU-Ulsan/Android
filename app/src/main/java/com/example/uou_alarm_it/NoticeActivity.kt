@@ -3,16 +3,22 @@ package com.example.uou_alarm_it
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -45,6 +51,9 @@ class NoticeActivity : AppCompatActivity() {
 
     var keyWord: String = ""
     var major: String = "ICT융합학부" // 기본값
+
+    private var customNotificationView: View? = null
+    private val notificationDuration = 5000L // 5초
 
     lateinit var setting: Setting
 
@@ -210,6 +219,7 @@ class NoticeActivity : AppCompatActivity() {
             }
             setCategory(category)
         }
+        showCustomNotification()
     }
 
     private fun initNotification() {
@@ -229,6 +239,61 @@ class NoticeActivity : AppCompatActivity() {
         } else {
             binding.noticeEmptyLogoIv.visibility = View.GONE
             binding.noticeRv.visibility = View.VISIBLE
+        }
+    }
+
+    fun Context.dpToPx(dp: Float): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            resources.displayMetrics
+        ).toInt()
+    }
+
+    private fun showCustomNotification() {
+        if (customNotificationView != null) {
+            hideCustomNotification()
+        }
+
+        // 1) 레이아웃 인플레이트
+        customNotificationView = layoutInflater.inflate(R.layout.dialog_change_major, null)
+
+        val rootView = findViewById<ViewGroup>(android.R.id.content)
+
+        val params = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.BOTTOM
+            bottomMargin = dpToPx(82f)
+            leftMargin = dpToPx(12f)
+            rightMargin = dpToPx(12f)
+        }
+
+        rootView.addView(customNotificationView, params)
+
+        // 3) 슬라이드 인 애니메이션 시작
+        val slideIn = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_bottom)
+        customNotificationView?.startAnimation(slideIn)
+
+        // 4) 일정 시간 후 알림 제거 (5초)
+        Handler(Looper.getMainLooper()).postDelayed({
+            hideCustomNotification()
+        }, notificationDuration)
+    }
+
+    private fun hideCustomNotification() {
+        customNotificationView?.let { view ->
+            val slideOut = AnimationUtils.loadAnimation(this, R.anim.anim_slide_out_bottom)
+            slideOut.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+                override fun onAnimationEnd(animation: Animation?) {
+                    (view.parent as? ViewGroup)?.removeView(view)
+                    customNotificationView = null
+                }
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+            view.startAnimation(slideOut)
         }
     }
 
