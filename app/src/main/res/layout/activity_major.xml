@@ -39,7 +39,7 @@
             android:id="@+id/major_next_btn_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="다음"
+            android:text="완료"
             android:textSize="15dp"
             android:textColor="@color/green_70"
             android:textStyle="bold"
