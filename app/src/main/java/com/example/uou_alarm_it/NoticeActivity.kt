@@ -242,6 +242,7 @@ class NoticeActivity : AppCompatActivity() {
         }
     }
 
+    // 전공 변경 다이얼로그 위치 설정을 위한 dp단위 변환 함수
     fun Context.dpToPx(dp: Float): Int {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -260,6 +261,7 @@ class NoticeActivity : AppCompatActivity() {
 
         val rootView = findViewById<ViewGroup>(android.R.id.content)
 
+        // 다이얼로그 위치 지정 (마진값 조정)
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
