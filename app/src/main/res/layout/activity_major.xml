@@ -1,103 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".MajorActivity">
 
-    <LinearLayout
-        android:id="@+id/major_back_btn_iv"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="51dp"
-        android:layout_marginStart="32dp"
-        android:gravity="center">
-
-        <ImageView
-            android:layout_width="10dp"
-            android:layout_height="18dp"
-            android:src="@drawable/btn_previous"/>
+        android:paddingHorizontal="30dp">
 
         <TextView
+            android:id="@+id/major_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="전공선택"
-            android:textSize="20sp"
-            android:textColor="@color/black"
+            android:text="공지를 확인할 전공을\n선택해주세요!"
+            android:textSize="20dp"
             android:textStyle="bold"
-            android:layout_marginStart="18dp" />
-
-    </LinearLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:visibility="gone"
-        android:id="@+id/major_uou_cl"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="41dp"
-        app:layout_constraintTop_toBottomOf="@id/major_back_btn_iv"
-        android:paddingHorizontal="32dp">
-
-        <TextView
-            android:id="@+id/major_uou_title_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="울산대학교"
-            android:textStyle="bold"
+            android:letterSpacing="-0.032"
             android:textColor="@color/black"
-            android:textSize="12sp"
+            android:layout_marginTop="134dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
-            android:id="@+id/major_sw_tv"
+            android:id="@+id/major_notice_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SW 사업단"
-            android:textSize="15sp"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toBottomOf="@id/major_uou_title_tv"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="18dp"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/major_fe_cl"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="41dp"
-        app:layout_constraintTop_toBottomOf="@id/major_uou_cl"
-        android:paddingHorizontal="32dp">
+            android:text="학과는 언제든지 또 변경할 수 있어요"
+            android:textSize="12dp"
+            android:letterSpacing="-0.026"
+            app:layout_constraintTop_toBottomOf="@id/major_title_tv"
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <TextView
-            android:id="@+id/major_fe_title_tv"
+            android:id="@+id/major_next_btn_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="미래엔지니어링융합대학"
+            android:text="완료"
+            android:textSize="15dp"
+            android:textColor="@color/green_70"
             android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            android:layout_gravity="start"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="@id/major_title_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="-5dp"
+            android:layout_marginEnd="-10dp"
+            android:padding="10dp"/>
 
-        <GridLayout
-            android:id="@+id/major_fe_gl"
+        <EditText
+            android:id="@+id/major_search_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:useDefaultMargins="true"
-            android:columnCount="2"
-            app:layout_constraintTop_toBottomOf="@id/major_fe_title_tv"
-            android:layout_marginTop="18dp"/>
-        
-        
+            android:background="@drawable/edittext_bottom_line"
+            android:textColor="@color/black"
+            android:hint="알림 받을 학과를 입력해주세요"
+            android:textColorHint="#A3A3A3"
+            android:textSize="15dp"
+            android:letterSpacing="-0.032"
+            app:layout_constraintTop_toBottomOf="@id/major_notice_tv"
+            android:layout_marginTop="50dp"/>
+
+        <TextView
+            android:id="@+id/major_search_btn_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="검색"
+            android:textSize="15dp"
+            android:textColor="@color/green_70"
+            android:padding="5dp"
+            app:layout_constraintTop_toTopOf="@id/major_search_et"
+            app:layout_constraintBottom_toBottomOf="@id/major_search_et"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/major_choice_college_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/major_search_et"
+            android:layout_marginTop="63dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

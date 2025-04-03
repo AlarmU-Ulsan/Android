@@ -3,16 +3,22 @@ package com.example.uou_alarm_it
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -45,6 +51,11 @@ class NoticeActivity : AppCompatActivity() {
 
     var keyWord: String = ""
     var major: String = "ICT융합학부" // 기본값
+
+    private var customNotificationView: View? = null
+    private val notificationDuration = 5000L // 5초
+    private val notificationHandler = Handler(Looper.getMainLooper())
+    private var notificationRunnable: Runnable? = null
 
     lateinit var setting: Setting
 
@@ -89,13 +100,6 @@ class NoticeActivity : AppCompatActivity() {
         // Intent extra "major" 값
         val intentMajor = intent.getStringExtra("major")
 
-        // 로그로 값 확인
-        Log.d("NoticeActivity", "=== 초기 로그 ===")
-        Log.d("NoticeActivity", "isFirstRun: $isFirstRun")
-        Log.d("NoticeActivity", "SharedPreferences selected_major: $spMajor")
-        Log.d("NoticeActivity", "Setting.notificationMajor: ${setting.notificationMajor}")
-        Log.d("NoticeActivity", "Intent extra major: $intentMajor")
-
         // 최초 실행 시에만 Intent extra "major"를 적용하고 플래그를 false로 업데이트
         major = if (isFirstRun && !intentMajor.isNullOrEmpty() && setting.notificationMajor == defaultMajor) {
             sharedPref.edit().putString("selected_major", intentMajor)
@@ -126,7 +130,7 @@ class NoticeActivity : AppCompatActivity() {
         binding.noticeTabBookmarkIv.setOnClickListener { setCategory(3) }
 
         binding.noticeSearchCl.setOnClickListener {
-            if (binding.noticeSearchEt.visibility == View.GONE) {
+            if (binding.noticeSearchBarCl.visibility == View.GONE) {
                 animSearch()
             } else {
                 noticeSearch(binding.noticeSearchEt.text.toString())
@@ -185,7 +189,9 @@ class NoticeActivity : AppCompatActivity() {
             initNotification()
         }
         binding.noticeSelectBtnLl.setOnClickListener {
-            val intent = Intent(this, MajorActivity::class.java)
+            val intent = Intent(this, MajorActivity::class.java).apply {
+                putExtra("currentSelectedMajor", major)  // NoticeActivity에 저장된 전공 변수
+            }
             startActivityForResult(intent, REQUEST_CODE_MAJOR)
         }
         updateEmptyState()
@@ -195,20 +201,28 @@ class NoticeActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_MAJOR && resultCode == RESULT_OK) {
             val selectedText = data?.getStringExtra("selectedItem")
-            Log.d("NoticeActivity", "Selected item: $selectedText")
-            binding.noticeSelectedMajorTv.text = selectedText
+            // 기존 전공 값을 임시로 보관
+            val previousMajor = major
+
+            // 새 전공이 비어있지 않으면 처리
             if (!selectedText.isNullOrEmpty()) {
+                binding.noticeSelectedMajorTv.text = selectedText
                 major = selectedText
                 setting.notificationMajor = major
                 saveSetting(setting)
-                // 추가: SharedPreferences "selected_major" 값도 업데이트
+                // SharedPreferences "selected_major" 업데이트
                 val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
                 sharedPref.edit().putString("selected_major", major).apply()
 
                 unConnectNotification()
                 connectNotification()
+                setCategory(category)
+
+                // 전공이 실제로 변경되었을 때만 다이얼로그 표시
+                if (selectedText != previousMajor) {
+                    showCustomNotification()
+                }
             }
-            setCategory(category)
         }
     }
 
@@ -230,6 +244,83 @@ class NoticeActivity : AppCompatActivity() {
             binding.noticeEmptyLogoIv.visibility = View.GONE
             binding.noticeRv.visibility = View.VISIBLE
         }
+    }
+
+    // 전공 변경 다이얼로그 위치 설정을 위한 dp단위 변환 함수
+    fun Context.dpToPx(dp: Float): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            resources.displayMetrics
+        ).toInt()
+    }
+
+    private fun showCustomNotification() {
+        // 만약 이미 다이얼로그가 표시 중이라면 먼저 슬라이드 아웃 애니메이션으로 제거 후 새 다이얼로그 표시
+        if (customNotificationView != null) {
+            // 기존에 예약된 hide 콜백 취소
+            notificationRunnable?.let { notificationHandler.removeCallbacks(it) }
+            // 기존 뷰에 슬라이드 아웃 애니메이션 적용 후 제거
+            val oldView = customNotificationView
+            val slideOut = AnimationUtils.loadAnimation(this, R.anim.anim_slide_out_bottom)
+            slideOut.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+                override fun onAnimationEnd(animation: Animation?) {
+                    (oldView?.parent as? ViewGroup)?.removeView(oldView)
+                    customNotificationView = null
+                    // 이전 다이얼로그가 완전히 제거된 후 새 다이얼로그 표시
+                    actuallyShowCustomNotification()
+                }
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+            oldView?.startAnimation(slideOut)
+        } else {
+            actuallyShowCustomNotification()
+        }
+    }
+
+    private fun actuallyShowCustomNotification() {
+        // 1) 레이아웃 인플레이트
+        customNotificationView = layoutInflater.inflate(R.layout.dialog_change_major, null)
+        val rootView = findViewById<ViewGroup>(android.R.id.content)
+
+        // 2) 위치와 마진 설정 (하단, 좌우 12dp, 아래쪽 82dp)
+        val params = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.BOTTOM
+            bottomMargin = dpToPx(82f)
+            leftMargin = dpToPx(12f)
+            rightMargin = dpToPx(12f)
+        }
+        rootView.addView(customNotificationView, params)
+
+        // 3) 슬라이드 인 애니메이션 시작
+        val slideIn = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_bottom)
+        customNotificationView?.startAnimation(slideIn)
+
+        // 4) 기존에 예약된 hide 콜백 제거 후, 5초 후 hideCustomNotification() 호출 예약
+        notificationRunnable?.let { notificationHandler.removeCallbacks(it) }
+        notificationRunnable = Runnable { hideCustomNotification() }
+        notificationHandler.postDelayed(notificationRunnable!!, notificationDuration)
+    }
+
+    private fun hideCustomNotification() {
+        customNotificationView?.let { view ->
+            val slideOut = AnimationUtils.loadAnimation(this, R.anim.anim_slide_out_bottom)
+            slideOut.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+                override fun onAnimationEnd(animation: Animation?) {
+                    (view.parent as? ViewGroup)?.removeView(view)
+                    customNotificationView = null
+                }
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+            view.startAnimation(slideOut)
+        }
+        notificationRunnable?.let { notificationHandler.removeCallbacks(it) }
+        notificationRunnable = null
     }
 
     private fun initAllTab() {
@@ -464,7 +555,7 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun animSearch() {
-        if (binding.noticeSearchEt.visibility == View.VISIBLE) {
+        if (binding.noticeSearchBarCl.visibility == View.VISIBLE) {
             val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_close)
             animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
@@ -472,12 +563,11 @@ class NoticeActivity : AppCompatActivity() {
                     binding.noticeCloseSearchCl.visibility = View.GONE
                     binding.noticeSearchIv.visibility = View.VISIBLE
                     binding.noticeSearchCl.visibility = View.VISIBLE
-                    binding.noticeSelectBtnLl.visibility = View.VISIBLE
                 }
                 override fun onAnimationEnd(p0: Animation?) {
-                    binding.noticeNoticeIv.visibility = View.VISIBLE
-                    binding.noticeNoticeCl.visibility = View.VISIBLE
-                    binding.noticeSearchEt.visibility = View.GONE
+                    binding.noticeSearchBarCl.visibility = View.GONE
+                    binding.noticeTabLl.visibility = View.VISIBLE
+                    binding.noticeLineView.visibility = View.VISIBLE
                     binding.noticeSearchEt.setText("")
                     if (category == 4) {
                         setCategory(1)
@@ -491,20 +581,19 @@ class NoticeActivity : AppCompatActivity() {
             val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_open)
             animation.setAnimationListener(object : AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {
-                    binding.noticeSearchEt.visibility = View.VISIBLE
-                    binding.noticeNoticeIv.visibility = View.GONE
-                    binding.noticeNoticeCl.visibility = View.GONE
+                    binding.noticeSearchBarCl.visibility = View.VISIBLE
                     binding.noticeCloseSearchIv.visibility = View.VISIBLE
                     binding.noticeCloseSearchCl.visibility = View.VISIBLE
                     binding.noticeSearchIv.visibility = View.GONE
                     binding.noticeSearchCl.visibility = View.GONE
-                    binding.noticeSelectBtnLl.visibility = View.GONE
+                    binding.noticeTabLl.visibility = View.GONE
+                    binding.noticeLineView.visibility = View.GONE
                 }
                 override fun onAnimationEnd(p0: Animation?) {}
                 override fun onAnimationRepeat(p0: Animation?) {}
             })
-            binding.noticeSearchEt.visibility = View.VISIBLE
-            binding.noticeSearchEt.startAnimation(animation)
+            binding.noticeSearchBarCl.visibility = View.VISIBLE
+            binding.noticeSearchBarCl.startAnimation(animation)
             Log.d("anim", "open")
         }
     }
