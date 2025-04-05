@@ -48,6 +48,9 @@
         <activity
             android:name=".WebActivity"
             android:exported="false" />
+        <activity
+            android:name=".AlarmChoiceActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -182,10 +182,13 @@ class NoticeActivity : AppCompatActivity() {
         initNotification()
 
         binding.noticeNoticeCl.setOnClickListener {
-            setting.notificationSetting = !setting.notificationSetting
-            setting.notificationMajor = major
-            saveSetting(setting)
-            initNotification()
+//            기존 알림 설정 코드
+//            setting.notificationSetting = !setting.notificationSetting
+//            setting.notificationMajor = major
+//            saveSetting(setting)
+//            initNotification()
+            val intent = Intent(this, AlarmChoiceActivity::class.java)
+            startActivity(intent)
         }
         binding.noticeSelectBtnLl.setOnClickListener {
             val intent = Intent(this, MajorActivity::class.java).apply {
