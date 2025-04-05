@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.uou_alarm_it.CollegesList.College
+import com.example.uou_alarm_it.CollegesList.collegesList
 import com.example.uou_alarm_it.databinding.ActivityAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
@@ -21,7 +22,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         super.onCreate(savedInstanceState)
         binding = ActivityAlarmChoiceBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initRV()
+        initRV(collegesList)
 
         setting = loadSetting(this)
         selectMajor = setting.notificationMajor
@@ -35,10 +36,29 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         binding.alarmChoiceBack.setOnClickListener {
             finish()
         }
+
+        binding.alarmChoiceSearch.setOnClickListener {
+            var keyWord = binding.alarmChoiceEt.text
+            var colleges: MutableList<College> = mutableListOf()
+
+            if (keyWord.isEmpty()) {
+                colleges = collegesList
+            }
+            else {
+                for (c in collegesList) {
+                    val m = (c.majors.filter { it -> it.lowercase().contains(keyWord) }).toMutableList()
+                    if (m.isNotEmpty()) {
+                        colleges.add(College(c.name, m))
+                    }
+                }
+            }
+
+            initRV(colleges)
+        }
     }
 
-    private fun initRV() {
-        val collegeRVAdapter = CollegeRVAdapter(CollegesList.collegesList)
+    private fun initRV(colleges: MutableList<CollegesList.College>) {
+        val collegeRVAdapter = CollegeRVAdapter(colleges)
         binding.alarmChoiceRv.adapter = collegeRVAdapter
         binding.alarmChoiceRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
@@ -52,7 +72,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         }
     }
 
-    inner class CollegeRVAdapter(private val colleges: Array<College>): RecyclerView.Adapter<CollegeRVAdapter.ViewHolder>() {
+    inner class CollegeRVAdapter(private val colleges: MutableList<College>): RecyclerView.Adapter<CollegeRVAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollegeRVAdapter.ViewHolder {
             val collegeBinding = ItemAlarmChoiceCollegeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -107,7 +127,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                         majorBinding.root.setOnClickListener{
                             selectMajor = major
                             changeMajor(this@AlarmChoiceActivity, selectMajor)
-                            initRV()
+                            initRV(collegesList)
                         }
                     }
                 }

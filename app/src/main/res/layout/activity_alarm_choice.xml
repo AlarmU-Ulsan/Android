@@ -74,7 +74,7 @@
             android:layout_marginHorizontal="30dp"/>
 
         <TextView
-            android:id="@+id/alarm_choice_tv"
+            android:id="@+id/alarm_choice_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="검색"
