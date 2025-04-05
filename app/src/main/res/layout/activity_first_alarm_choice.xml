@@ -93,7 +93,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/first_alarm_search_et"
-            android:layout_marginTop="63dp"/>
+            android:layout_marginTop="63dp"
+            tools:listitem="@layout/item_college_alarm"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
