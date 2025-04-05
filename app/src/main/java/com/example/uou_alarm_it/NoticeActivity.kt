@@ -40,7 +40,7 @@ import retrofit2.Response
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-class NoticeActivity : AppCompatActivity() {
+class NoticeActivity : AppCompatActivity(), SettingInterface {
     lateinit var binding: ActivityNoticeBinding
     lateinit var noticeRVAdapter: NoticeRVAdapter
 
@@ -88,7 +88,7 @@ class NoticeActivity : AppCompatActivity() {
         }
 
         // 기존 저장된 Setting을 불러옵니다.
-        setting = loadSetting()
+        setting = loadSetting(this)
 
         // SharedPreferences에서 "selected_major"와 최초 실행 플래그("isFirstNoticeRun")를 읽어옵니다.
         val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
@@ -111,7 +111,7 @@ class NoticeActivity : AppCompatActivity() {
 
         // 업데이트된 major 값을 Setting에 반영하고 저장
         setting.notificationMajor = major
-        saveSetting(setting)
+        saveSetting(this,setting)
 
         Log.d("NoticeActivity", "최종 major 값: $major")
         binding.noticeSelectedMajorTv.text = major
@@ -201,7 +201,7 @@ class NoticeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        setting = loadSetting()
+        setting = loadSetting(this)
         initNotification()
     }
 
@@ -216,14 +216,9 @@ class NoticeActivity : AppCompatActivity() {
             if (!selectedText.isNullOrEmpty()) {
                 binding.noticeSelectedMajorTv.text = selectedText
                 major = selectedText
-                setting.notificationMajor = major
-                saveSetting(setting)
                 // SharedPreferences "selected_major" 업데이트
                 val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
                 sharedPref.edit().putString("selected_major", major).apply()
-
-                unConnectNotification()
-                connectNotification()
                 setCategory(category)
 
                 // 전공이 실제로 변경되었을 때만 다이얼로그 표시
@@ -237,10 +232,8 @@ class NoticeActivity : AppCompatActivity() {
     private fun initNotification() {
         if (setting.notificationSetting) {
             binding.noticeNoticeIv.setImageResource(R.drawable.notice_on)
-            connectNotification()
         } else {
             binding.noticeNoticeIv.setImageResource(R.drawable.notice_off)
-            unConnectNotification()
         }
     }
 
@@ -603,71 +596,6 @@ class NoticeActivity : AppCompatActivity() {
             binding.noticeSearchBarCl.visibility = View.VISIBLE
             binding.noticeSearchBarCl.startAnimation(animation)
             Log.d("anim", "open")
-        }
-    }
-
-    private fun connectNotification() {
-        var token = ""
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
-                return@addOnCompleteListener
-            } else {
-                token = task.result.toString()
-                Log.d("FCM", "FCM 토큰: $token")
-                RetrofitClient.service.postFCMRegister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
-                    override fun onResponse(
-                        call: Call<PostFCMRegisterResponse>,
-                        response: Response<PostFCMRegisterResponse>
-                    ) {
-                        Log.d("FCM", "FCM 연결 성공")
-                    }
-                    override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
-                        Log.e("FCM", "FCM 연결 실패" + t)
-                    }
-                })
-            }
-        }
-    }
-    private fun unConnectNotification() {
-        var token = ""
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
-                return@addOnCompleteListener
-            } else {
-                token = task.result.toString()
-                Log.d("FCM", "FCM 토큰: $token")
-                RetrofitClient.service.deleteFCMUnregister(token, major).enqueue(object: Callback<PostFCMRegisterResponse>{
-                    override fun onResponse(
-                        call: Call<PostFCMRegisterResponse>,
-                        response: Response<PostFCMRegisterResponse>
-                    ) {
-                        Log.d("FCM", "FCM 연결 해제 성공")
-                    }
-                    override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
-                        Log.e("FCM", "FCM 연결 해제 실패" + t)
-                    }
-                })
-            }
-        }
-    }
-    fun saveSetting(setting: Setting) {
-        val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val gson = Gson()
-        val json = gson.toJson(setting)
-        editor.putString("Setting", json)
-        editor.apply()
-    }
-    fun loadSetting(): Setting {
-        val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
-        val gson = Gson()
-        val json = sharedPreferences.getString("Setting", null)
-        return if (json != null) {
-            gson.fromJson(json, Setting::class.java)
-        } else {
-            Setting(true, "ICT융합학부")
         }
     }
 }
