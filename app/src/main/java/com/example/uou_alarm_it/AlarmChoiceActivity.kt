@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.uou_alarm_it.CollegesList.College
 import com.example.uou_alarm_it.databinding.ActivityAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
@@ -18,19 +19,21 @@ class AlarmChoiceActivity: AppCompatActivity() {
         binding = ActivityAlarmChoiceBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val collegeRVAdapter = CollegeRVAdapter()
+        val collegeRVAdapter = CollegeRVAdapter(CollegesList.collegesList)
         binding.alarmChoiceRv.adapter = collegeRVAdapter
         binding.alarmChoiceRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
 
-    inner class CollegeRVAdapter(): RecyclerView.Adapter<CollegeRVAdapter.ViewHolder>() {
+    inner class CollegeRVAdapter(colleges: Array<College>): RecyclerView.Adapter<CollegeRVAdapter.ViewHolder>() {
+        var colleges = colleges
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollegeRVAdapter.ViewHolder {
             val collegeBinding = ItemAlarmChoiceCollegeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return ViewHolder(collegeBinding)
         }
 
         override fun onBindViewHolder(holder: CollegeRVAdapter.ViewHolder, collegePos: Int) {
-            holder.bind(CollegesList.collegesList[collegePos])
+            holder.bind(colleges[collegePos])
         }
 
         override fun getItemCount(): Int = CollegesList.collegesList.size
@@ -47,6 +50,7 @@ class AlarmChoiceActivity: AppCompatActivity() {
 
             inner class MajorRVAdapter(majors: Array<String>): RecyclerView.Adapter<MajorRVAdapter.ViewHolder>() {
                 val majors = majors
+
                 override fun onCreateViewHolder(
                     parent: ViewGroup,
                     viewType: Int
