@@ -3,6 +3,7 @@ package com.example.uou_alarm_it
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,10 +66,12 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
 
     private fun initToggle() {
         if (setting.notificationSetting) {
-            binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_on)
+            binding.alarmChoiceToggleOn.visibility = View.VISIBLE
+            binding.alarmChoiceToggleOff.visibility = View.GONE
         }
         else {
-            binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_off)
+            binding.alarmChoiceToggleOn.visibility = View.GONE
+            binding.alarmChoiceToggleOff.visibility = View.VISIBLE
         }
     }
 
