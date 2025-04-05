@@ -44,7 +44,7 @@ class NoticeActivity : AppCompatActivity() {
     lateinit var binding: ActivityNoticeBinding
     lateinit var noticeRVAdapter: NoticeRVAdapter
 
-    var eventSource: BackgroundEventSource? = null
+    lateinit var setting: Setting
 
     var bookmarkImportant: HashSet<Notice> = hashSetOf()
     var bookmarkCommon: HashSet<Notice> = hashSetOf()
@@ -52,12 +52,15 @@ class NoticeActivity : AppCompatActivity() {
     var keyWord: String = ""
     var major: String = "ICT융합학부" // 기본값
 
+    var isLast = false
+    var page = 0
+    var isLoading = false
+
     private var customNotificationView: View? = null
     private val notificationDuration = 5000L // 5초
     private val notificationHandler = Handler(Looper.getMainLooper())
     private var notificationRunnable: Runnable? = null
 
-    lateinit var setting: Setting
 
     companion object {
         var category: Int = 1
@@ -65,10 +68,6 @@ class NoticeActivity : AppCompatActivity() {
         var bookmarkList: HashSet<Notice> = hashSetOf()
         const val REQUEST_CODE_MAJOR = 100
     }
-
-    var isLast = false
-    var page = 0
-    var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
