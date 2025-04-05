@@ -598,7 +598,7 @@ class NoticeActivity : AppCompatActivity() {
         }
     }
 
-    private fun getFcmToken(){
+    private fun connectNotification() {
         var token = ""
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -621,7 +621,7 @@ class NoticeActivity : AppCompatActivity() {
             }
         }
     }
-    private fun deleteFcmToken() {
+    private fun unConnectNotification() {
         var token = ""
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -643,30 +643,6 @@ class NoticeActivity : AppCompatActivity() {
                 })
             }
         }
-    }
-    private fun connectNotification() {
-        eventSource = BackgroundEventSource.Builder(
-            SSEService(this),
-            EventSource.Builder(
-                ConnectStrategy.http(URL("https://alarm-it.ulsan.ac.kr:58080/notification/subscribe?major=$major"))
-                    .connectTimeout(3, TimeUnit.SECONDS)
-                    .readTimeout(600, TimeUnit.SECONDS)
-            )
-        )
-            .threadPriority(Thread.MAX_PRIORITY)
-            .build()
-        eventSource?.start()
-        getFcmToken()
-    }
-    private fun unConnectNotification() {
-        try {
-            eventSource?.close()
-        } catch (e: Exception) {
-            Log.e("SSEService", "오류 발생: ${e.message}")
-        } finally {
-            eventSource = null
-        }
-        deleteFcmToken()
     }
     fun saveSetting(setting: Setting) {
         val sharedPreferences = this.getSharedPreferences("Setting", Context.MODE_PRIVATE)
