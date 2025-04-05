@@ -13,6 +13,7 @@ import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
 
 class AlarmChoiceActivity: AppCompatActivity() {
     lateinit var binding: ActivityAlarmChoiceBinding
+    lateinit var setting: Setting
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +23,16 @@ class AlarmChoiceActivity: AppCompatActivity() {
         val collegeRVAdapter = CollegeRVAdapter(CollegesList.collegesList)
         binding.alarmChoiceRv.adapter = collegeRVAdapter
         binding.alarmChoiceRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        binding.alarmChoiceToggle.setOnClickListener {
+            if (setting.notificationSetting) {
+                binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_off)
+            }
+            else {
+                binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_on)
+            }
+            setting.notificationSetting = !setting.notificationSetting
+        }
     }
 
     inner class CollegeRVAdapter(colleges: Array<College>): RecyclerView.Adapter<CollegeRVAdapter.ViewHolder>() {

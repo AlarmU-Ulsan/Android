@@ -38,10 +38,10 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/alarm_choice_togle"
+            android:id="@+id/alarm_choice_toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/togle_on"
+            android:src="@drawable/toggle_on"
             android:layout_marginTop="39dp"
             android:layout_marginEnd="30dp"
             app:layout_constraintTop_toTopOf="parent"
