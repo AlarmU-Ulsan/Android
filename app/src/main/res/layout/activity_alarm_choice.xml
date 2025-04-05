@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/alarm_choice_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="48dp"
+            android:layout_marginStart="32dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="18dp"
+                android:src="@drawable/back"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="알림"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:layout_marginStart="18dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/alarm_choice_toggle"
+            android:layout_width="58dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="39dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/alarm_choice_toggle_on"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/toggle_on"
+                android:layout_marginStart="10dp"/>
+
+            <ImageView
+                android:id="@+id/alarm_choice_toggle_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/toggle_off"
+                android:layout_marginEnd="10dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/alarm_choice_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="새 공지 알림 전공 변경"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:layout_marginTop="50dp"
+            app:layout_constraintTop_toBottomOf="@id/alarm_choice_back"
+            app:layout_constraintStart_toStartOf="@id/alarm_choice_back"/>
+
+
+        <EditText
+            android:id="@+id/alarm_choice_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bottom_line"
+            android:textColor="@color/black"
+            android:hint="알림 받을 전공을 입력해주세요"
+            android:textColorHint="#A3A3A3"
+            android:textSize="15dp"
+            app:layout_constraintTop_toBottomOf="@id/alarm_choice_title"
+            android:layout_marginTop="57dp"
+            android:layout_marginHorizontal="30dp"/>
+
+        <TextView
+            android:id="@+id/alarm_choice_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="검색"
+            android:textSize="15dp"
+            android:textColor="@color/green_70"
+            android:padding="5dp"
+            app:layout_constraintTop_toTopOf="@id/alarm_choice_et"
+            app:layout_constraintBottom_toBottomOf="@id/alarm_choice_et"
+            app:layout_constraintEnd_toEndOf="@id/alarm_choice_et"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/alarm_choice_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="63dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="36dp"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            app:layout_constraintTop_toBottomOf="@id/alarm_choice_et"
+            tools:listitem="@layout/item_alarm_choice_college"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

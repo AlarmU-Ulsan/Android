@@ -13,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="16dp"
-        android:textColor="@color/black"
-        android:letterSpacing="-0.027"/>
+        android:text="학과명"
+        android:textColor="@color/black"/>
 
     <ImageView
         android:id="@+id/item_major_alarm_choice_checkbox_iv"
