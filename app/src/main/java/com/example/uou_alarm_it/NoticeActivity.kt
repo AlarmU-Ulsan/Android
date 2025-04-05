@@ -199,6 +199,12 @@ class NoticeActivity : AppCompatActivity() {
         updateEmptyState()
     }
 
+    override fun onResume() {
+        super.onResume()
+        setting = loadSetting()
+        initNotification()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_MAJOR && resultCode == RESULT_OK) {

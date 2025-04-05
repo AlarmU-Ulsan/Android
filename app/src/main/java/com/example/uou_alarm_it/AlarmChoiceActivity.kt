@@ -11,7 +11,7 @@ import com.example.uou_alarm_it.databinding.ActivityAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
 
-class AlarmChoiceActivity: AppCompatActivity() {
+class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
     lateinit var binding: ActivityAlarmChoiceBinding
     lateinit var setting: Setting
 
@@ -24,14 +24,26 @@ class AlarmChoiceActivity: AppCompatActivity() {
         binding.alarmChoiceRv.adapter = collegeRVAdapter
         binding.alarmChoiceRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
+        setting = loadSetting(this)
+        initToggle()
+
+
         binding.alarmChoiceToggle.setOnClickListener {
-            if (setting.notificationSetting) {
-                binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_off)
-            }
-            else {
-                binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_on)
-            }
-            setting.notificationSetting = !setting.notificationSetting
+            setting.notificationSetting = changeSetting(this)
+            initToggle()
+        }
+
+        binding.alarmChoiceBack.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun initToggle() {
+        if (setting.notificationSetting) {
+            binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_on)
+        }
+        else {
+            binding.alarmChoiceToggle.setImageResource(R.drawable.toggle_off)
         }
     }
 
