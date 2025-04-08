@@ -1,6 +1,8 @@
 package com.example.uou_alarm_it
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.uou_alarm_it.CollegesList.College
 import com.example.uou_alarm_it.CollegesList.collegesList
+import com.example.uou_alarm_it.NoticeActivity.Companion.bookmarkList
+import com.example.uou_alarm_it.NoticeActivity.Companion.category
+import com.example.uou_alarm_it.NoticeActivity.Companion.noticeList
 import com.example.uou_alarm_it.databinding.ActivityAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
@@ -38,24 +43,28 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
             finish()
         }
 
-        binding.alarmChoiceSearch.setOnClickListener {
-            var keyWord = binding.alarmChoiceEt.text
-            var colleges: MutableList<College> = mutableListOf()
+        binding.alarmChoiceEt.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                var keyWord = binding.alarmChoiceEt.text
+                var colleges: MutableList<College> = mutableListOf()
 
-            if (keyWord.isEmpty()) {
-                colleges = collegesList
-            }
-            else {
-                for (c in collegesList) {
-                    val m = (c.majors.filter { it -> it.lowercase().contains(keyWord) }).toMutableList()
-                    if (m.isNotEmpty()) {
-                        colleges.add(College(c.name, m))
+                if (keyWord.isEmpty()) {
+                    colleges = collegesList
+                }
+                else {
+                    for (c in collegesList) {
+                        val m = (c.majors.filter { it -> it.lowercase().contains(keyWord) }).toMutableList()
+                        if (m.isNotEmpty()) {
+                            colleges.add(College(c.name, m))
+                        }
                     }
                 }
-            }
 
-            initRV(colleges)
-        }
+                initRV(colleges)
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun initRV(colleges: MutableList<CollegesList.College>) {
