@@ -16,7 +16,7 @@
             android:id="@+id/first_alarm_back_btn_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="전공선택"
+            android:text="&lt;  전공선택"
             android:textColor="@color/green_70"
             android:textSize="15dp"
             android:letterSpacing="-0.032"

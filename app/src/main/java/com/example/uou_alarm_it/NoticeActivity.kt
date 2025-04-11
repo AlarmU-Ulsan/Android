@@ -548,10 +548,11 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     }
 
     override fun onBackPressed() {
-        if (binding.noticeSearchEt.visibility == View.VISIBLE) {
+        if (binding.noticeSearchBarCl.visibility == View.VISIBLE) {
             animSearch()
         } else {
             super.onBackPressed()
+            finish()
         }
     }
 

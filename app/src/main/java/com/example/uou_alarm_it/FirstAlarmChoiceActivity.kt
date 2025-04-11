@@ -57,6 +57,8 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         }
 
         binding.firstAlarmBackBtnTv.setOnClickListener {
+            val intent = Intent(this, FirstNoticeChoiceActivity::class.java)
+            startActivity(intent)
             finish()
         }
 
