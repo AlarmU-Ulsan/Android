@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -84,15 +85,31 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
         })
     }
 
-    // 전공 선택 시, 전체 전공의 선택 상태를 업데이트하여 하나만 선택되도록 함
+    // 전공 선택 시, 전체 전공의 선택 상태를 업데이트하여 단 하나만 선택되도록 함
     private fun onMajorSelected(selectedMajor: Major) {
+        // 모든 전공의 선택 상태를 false로 초기화
         originalCollegeList.forEach { college ->
             college.majors.forEach { major ->
                 major.isChecked = false
             }
         }
+        // 클릭한 항목은 true로 설정
         selectedMajor.isChecked = true
         collegeAdapter.notifyDataSetChanged()
+
+        // 선택된 전공이 있다면 "다음" 버튼 표시, 없으면 숨깁니다.
+        updateNextButtonVisibility()
+    }
+
+    // 선택된 전공 개수를 확인하여 "다음" 버튼의 visibility를 조정하는 함수
+    private fun updateNextButtonVisibility() {
+        var selectedCount = 0
+        originalCollegeList.forEach { college ->
+            college.majors.forEach { major ->
+                if (major.isChecked) selectedCount++
+            }
+        }
+        binding.firstNoticeNextBtnTv.visibility = if (selectedCount > 0) View.VISIBLE else View.GONE
     }
 
     // 전공명 검색 로직
