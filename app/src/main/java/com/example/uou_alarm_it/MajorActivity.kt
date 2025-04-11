@@ -70,6 +70,10 @@ class MajorActivity : AppCompatActivity() {
             adapter = collegeAdapter
         }
 
+        binding.majorBackBtnLl.setOnClickListener {
+            finish()
+        }
+
         // "다음" 버튼 클릭 시, 선택한 전공명을 Intent extra로 전달하며 FirstAlarmChoiceActivity 실행
         binding.majorNextBtnTv.setOnClickListener {
             var selectedMajor: String? = null

@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
+import android.view.animation.AnimationUtils
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -84,15 +86,40 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
         })
     }
 
-    // 전공 선택 시, 전체 전공의 선택 상태를 업데이트하여 하나만 선택되도록 함
+    // 전공 선택 시, 전체 전공의 선택 상태를 업데이트하여 단 하나만 선택되도록 함
     private fun onMajorSelected(selectedMajor: Major) {
+        // 모든 전공의 선택 상태를 false로 초기화
         originalCollegeList.forEach { college ->
             college.majors.forEach { major ->
                 major.isChecked = false
             }
         }
+        // 클릭한 항목은 true로 설정
         selectedMajor.isChecked = true
         collegeAdapter.notifyDataSetChanged()
+
+        // 선택된 전공이 있다면 "다음" 버튼 표시, 없으면 숨깁니다.
+        updateNextButtonVisibility()
+    }
+
+    // 선택된 전공 개수를 확인하여 "다음" 버튼의 visibility를 조정하는 함수
+    private fun updateNextButtonVisibility() {
+        var selectedCount = 0
+        originalCollegeList.forEach { college ->
+            college.majors.forEach { major ->
+                if (major.isChecked) selectedCount++
+            }
+        }
+        if (selectedCount > 0) {
+            // 기존에 버튼이 보이지 않았다면 애니메이션 적용 후 visible로 변경
+            if (binding.firstNoticeNextBtnTv.visibility != View.VISIBLE) {
+                binding.firstNoticeNextBtnTv.visibility = View.VISIBLE
+                val slideInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
+                binding.firstNoticeNextBtnTv.startAnimation(slideInAnim)
+            }
+        } else {
+            binding.firstNoticeNextBtnTv.visibility = View.GONE
+        }
     }
 
     // 전공명 검색 로직
