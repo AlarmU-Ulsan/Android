@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -109,7 +110,16 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
                 if (major.isChecked) selectedCount++
             }
         }
-        binding.firstNoticeNextBtnTv.visibility = if (selectedCount > 0) View.VISIBLE else View.GONE
+        if (selectedCount > 0) {
+            // 기존에 버튼이 보이지 않았다면 애니메이션 적용 후 visible로 변경
+            if (binding.firstNoticeNextBtnTv.visibility != View.VISIBLE) {
+                binding.firstNoticeNextBtnTv.visibility = View.VISIBLE
+                val slideInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
+                binding.firstNoticeNextBtnTv.startAnimation(slideInAnim)
+            }
+        } else {
+            binding.firstNoticeNextBtnTv.visibility = View.GONE
+        }
     }
 
     // 전공명 검색 로직

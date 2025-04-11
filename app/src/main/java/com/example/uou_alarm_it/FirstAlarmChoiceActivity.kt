@@ -5,6 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -48,6 +51,7 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         collegeAdapter = CollegeAlarmAdapter(filteredCollegeList) { selectedMajor ->
             selectedMajor.isChecked = !selectedMajor.isChecked
             collegeAdapter.notifyDataSetChanged()
+            updateNextButtonVisibility()
         }
 
         binding.firstAlarmChoiceCollegeRv.apply {
@@ -99,5 +103,37 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
             }
         }
         collegeAdapter.notifyDataSetChanged()
+    }
+
+    // 선택된 전공(알림 채널)이 1개 이상이면 "다음" 버튼을 VISIBLE, 아니면 GONE으로 설정
+    private fun updateNextButtonVisibility() {
+        var selectedCount = 0
+        originalCollegeList.forEach { college ->
+            college.majors.forEach { major ->
+                if (major.isChecked) selectedCount++
+            }
+        }
+
+        if (selectedCount > 0) {
+            // 버튼이 이미 VISIBLE 상태가 아니면 fade in 애니메이션 적용
+            if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
+                binding.firstAlarmNextBtnTv.visibility = View.VISIBLE
+                val fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
+                binding.firstAlarmNextBtnTv.startAnimation(fadeInAnim)
+            }
+        } else {
+            // 버튼이 보이는 상태면 fade out 애니메이션 적용 후 GONE으로 설정
+            if (binding.firstAlarmNextBtnTv.visibility == View.VISIBLE) {
+                val fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_finish_btn)
+                fadeOutAnim.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation?) {}
+                    override fun onAnimationRepeat(animation: Animation?) {}
+                    override fun onAnimationEnd(animation: Animation?) {
+                        binding.firstAlarmNextBtnTv.visibility = View.GONE
+                    }
+                })
+                binding.firstAlarmNextBtnTv.startAnimation(fadeOutAnim)
+            }
+        }
     }
 }
