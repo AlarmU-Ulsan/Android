@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit
 class NoticeActivity : AppCompatActivity(), SettingInterface {
     lateinit var binding: ActivityNoticeBinding
     lateinit var noticeRVAdapter: NoticeRVAdapter
-
     lateinit var setting: Setting
 
     var bookmarkImportant: HashSet<Notice> = hashSetOf()
@@ -52,22 +51,22 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     var keyWord: String = ""
     var major: String = "ICT융합학부" // 기본값
 
-    var isLast = false
-    var page = 0
-    var isLoading = false
-
-    private var customNotificationView: View? = null
-    private val notificationDuration = 5000L // 5초
-    private val notificationHandler = Handler(Looper.getMainLooper())
-    private var notificationRunnable: Runnable? = null
-
-
     companion object {
         var category: Int = 1
         var noticeList: ArrayList<Notice> = arrayListOf()
         var bookmarkList: HashSet<Notice> = hashSetOf()
         const val REQUEST_CODE_MAJOR = 100
     }
+
+    var isLast = false
+    var page = 0
+    var isLoading = false
+
+    // 커스텀 알림 관련 변수...
+    private var customNotificationView: View? = null
+    private val notificationDuration = 5000L // 5초
+    private val notificationHandler = Handler(Looper.getMainLooper())
+    private var notificationRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,36 +86,44 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
             }
         }
 
-        // 기존 저장된 Setting을 불러옵니다.
+        // 기존 저장된 Setting 불러오기
         setting = loadSetting(this)
 
-        // SharedPreferences에서 "selected_major"와 최초 실행 플래그("isFirstNoticeRun")를 읽어옵니다.
+        // SharedPreferences에서 "selected_major"와 초기 플로우 완료 플래그("isInitialFlowComplete")를 읽어옵니다.
         val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
         val spMajor = sharedPref.getString("selected_major", null)
-        val isFirstRun = sharedPref.getBoolean("isFirstNoticeRun", true)
+        val isInitialFlowComplete = sharedPref.getBoolean("isInitialFlowComplete", false)
         val defaultMajor = "ICT융합학부"
 
-        // Intent extra "major" 값
+        // Intent extra "major"
         val intentMajor = intent.getStringExtra("major")
 
-        // 최초 실행 시에만 Intent extra "major"를 적용하고 플래그를 false로 업데이트
-        major = if (isFirstRun && !intentMajor.isNullOrEmpty() && setting.notificationMajor == defaultMajor) {
-            sharedPref.edit().putString("selected_major", intentMajor)
-                .putBoolean("isFirstNoticeRun", false)
-                .apply()
+        // 만약 초기 플로우가 완료되지 않았다면 다시 FirstNoticeChoiceActivity로 돌아갑니다.
+        if (!isInitialFlowComplete && intentMajor.isNullOrEmpty()) {
+            // 초기 플로우 미완료: FirstNoticeChoiceActivity부터 시작
+            val startIntent = Intent(this, FirstNoticeChoiceActivity::class.java)
+            startActivity(startIntent)
+            finish()
+            return
+        }
+
+        // 초기 플로우가 완료되었거나 Intent extra가 있는 경우:
+        // 최초 실행 시 Intent extra가 있으면 우선 적용 (그리고 플래그는 이미 true)
+        major = if (!intentMajor.isNullOrEmpty() && setting.notificationMajor == defaultMajor) {
+            intent.removeExtra("major")
             intentMajor
         } else {
             spMajor ?: setting.notificationMajor
         }
 
-        // 업데이트된 major 값을 Setting에 반영하고 저장
+        // 업데이트된 major 값을 setting에 반영하고 저장
         setting.notificationMajor = major
-        saveSetting(this,setting)
+        saveSetting(this, setting)
 
         Log.d("NoticeActivity", "최종 major 값: $major")
         binding.noticeSelectedMajorTv.text = major
 
-        // 즐겨찾기 리스트 불러오기 등 나머지 로직은 그대로 진행합니다.
+        // 즐겨찾기, 공지사항 조회, 탭, 검색 등의 나머지 로직은 기존 코드와 동일하게 실행
         bookmarkList = loadBookmarkList()
         bookmarkList.filter { it.type == "NOTICE" }.toCollection(bookmarkImportant)
         bookmarkList.filter { it.type == "COMMON" }.toCollection(bookmarkCommon)
@@ -155,7 +162,6 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
         }
 
         binding.noticeSearchEt.setTextCursorDrawable(R.drawable.edittext_cusor)
-
         binding.noticeSearchEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString()
@@ -182,17 +188,13 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
         initNotification()
 
         binding.noticeNoticeCl.setOnClickListener {
-//            기존 알림 설정 코드
-//            setting.notificationSetting = !setting.notificationSetting
-//            setting.notificationMajor = major
-//            saveSetting(setting)
-//            initNotification()
+            // 예시: AlarmChoiceActivity 실행
             val intent = Intent(this, AlarmChoiceActivity::class.java)
             startActivity(intent)
         }
         binding.noticeSelectBtnLl.setOnClickListener {
             val intent = Intent(this, MajorActivity::class.java).apply {
-                putExtra("currentSelectedMajor", major)  // NoticeActivity에 저장된 전공 변수
+                putExtra("currentSelectedMajor", major)
             }
             startActivityForResult(intent, REQUEST_CODE_MAJOR)
         }
@@ -209,19 +211,13 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_MAJOR && resultCode == RESULT_OK) {
             val selectedText = data?.getStringExtra("selectedItem")
-            // 기존 전공 값을 임시로 보관
             val previousMajor = major
-
-            // 새 전공이 비어있지 않으면 처리
             if (!selectedText.isNullOrEmpty()) {
                 binding.noticeSelectedMajorTv.text = selectedText
                 major = selectedText
-                // SharedPreferences "selected_major" 업데이트
                 val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
                 sharedPref.edit().putString("selected_major", major).apply()
                 setCategory(category)
-
-                // 전공이 실제로 변경되었을 때만 다이얼로그 표시
                 if (selectedText != previousMajor) {
                     showCustomNotification()
                 }

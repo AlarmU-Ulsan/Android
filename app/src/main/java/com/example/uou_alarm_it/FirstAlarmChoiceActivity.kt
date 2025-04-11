@@ -1,5 +1,6 @@
 package com.example.uou_alarm_it
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -43,10 +44,8 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         filteredCollegeList.clear()
         filteredCollegeList.addAll(originalCollegeList)
 
-        // 상위 RecyclerView 세팅
+        // 어댑터 생성 (전공 클릭 시 단순 토글 처리)
         collegeAdapter = CollegeAlarmAdapter(filteredCollegeList) { selectedMajor ->
-            // 여기서 클릭 시 처리할 로직을 구현합니다.
-            // 예: 멀티 선택이 가능하므로, 단순 토글 처리
             selectedMajor.isChecked = !selectedMajor.isChecked
             collegeAdapter.notifyDataSetChanged()
         }
@@ -57,46 +56,40 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         }
 
         binding.firstAlarmBackBtnTv.setOnClickListener {
+            // 뒤로가기 버튼 : FirstNoticeChoiceActivity로 돌아감.
             val intent = Intent(this, FirstNoticeChoiceActivity::class.java)
             startActivity(intent)
             finish()
         }
 
         binding.firstAlarmNextBtnTv.setOnClickListener {
+            // 사용자가 "다음" 버튼을 클릭하면, 초기 플로우 완료 플래그를 true로 저장하여 NoticeActivity로 전환합니다.
+            val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+            sharedPref.edit().putBoolean("isInitialFlowComplete", true).apply()
             val intent = Intent(this, NoticeActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        // 검색 EditText에 TextWatcher 추가
+        // 검색 EditText 관련 로직
         binding.firstAlarmSearchEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 filterMajors(s.toString())
             }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
 
-    // 전공명 검색 로직: 검색어가 포함된 전공만 필터링하여,
-    // 해당 전공이 있는 단과대학만 filteredCollegeList에 추가합니다.
     private fun filterMajors(query: String) {
         val trimmedQuery = query.trim().lowercase()
-
         filteredCollegeList.clear()
-
         if (trimmedQuery.isEmpty()) {
-            // 검색어가 없으면 전체 데이터 표시
             filteredCollegeList.addAll(originalCollegeList)
         } else {
-            // 각 단과대학 순회 -> 전공 중 검색어가 포함된 것만 추출
             for (college in originalCollegeList) {
-                val matchedMajors = college.majors.filter { major ->
-                    major.majorName.lowercase().contains(trimmedQuery)
-                }
-
+                val matchedMajors = college.majors.filter { it.majorName.lowercase().contains(trimmedQuery) }
                 if (matchedMajors.isNotEmpty()) {
-                    // 필터된 전공들만 가진 단과대학 객체 생성 (원본 Major 객체 참조하여 체크 상태 유지)
                     val filteredCollege = College(
                         collegeName = college.collegeName,
                         majors = matchedMajors.toMutableList()
