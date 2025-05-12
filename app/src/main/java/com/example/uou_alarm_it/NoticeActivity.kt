@@ -576,23 +576,32 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
             binding.noticeSearchEt.startAnimation(animation)
             Log.d("anim", "close")
         } else {
-            val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_open)
-            animation.setAnimationListener(object : AnimationListener {
-                override fun onAnimationStart(p0: Animation?) {
-                    binding.noticeSearchBarCl.visibility = View.VISIBLE
-                    binding.noticeCloseSearchIv.visibility = View.VISIBLE
-                    binding.noticeCloseSearchCl.visibility = View.VISIBLE
-                    binding.noticeSearchIv.visibility = View.GONE
-                    binding.noticeSearchCl.visibility = View.GONE
-                    binding.noticeTabLl.visibility = View.GONE
-                    binding.noticeLineView.visibility = View.GONE
-                }
-                override fun onAnimationEnd(p0: Animation?) {}
-                override fun onAnimationRepeat(p0: Animation?) {}
-            })
+            // 애니메이션 제거, 단순히 뷰만 보이게 설정
             binding.noticeSearchBarCl.visibility = View.VISIBLE
-            binding.noticeSearchBarCl.startAnimation(animation)
+            binding.noticeCloseSearchIv.visibility = View.VISIBLE
+            binding.noticeCloseSearchCl.visibility = View.VISIBLE
+            binding.noticeSearchIv.visibility = View.GONE
+            binding.noticeSearchCl.visibility = View.GONE
+            binding.noticeTabLl.visibility = View.GONE
+            binding.noticeLineView.visibility = View.GONE
             Log.d("anim", "open")
+//            val animation = AnimationUtils.loadAnimation(this, R.anim.anim_search_open)
+//            animation.setAnimationListener(object : AnimationListener {
+//                override fun onAnimationStart(p0: Animation?) {
+//                    binding.noticeSearchBarCl.visibility = View.VISIBLE
+//                    binding.noticeCloseSearchIv.visibility = View.VISIBLE
+//                    binding.noticeCloseSearchCl.visibility = View.VISIBLE
+//                    binding.noticeSearchIv.visibility = View.GONE
+//                    binding.noticeSearchCl.visibility = View.GONE
+//                    binding.noticeTabLl.visibility = View.GONE
+//                    binding.noticeLineView.visibility = View.GONE
+//                }
+//                override fun onAnimationEnd(p0: Animation?) {}
+//                override fun onAnimationRepeat(p0: Animation?) {}
+//            })
+//            binding.noticeSearchBarCl.visibility = View.VISIBLE
+//            binding.noticeSearchBarCl.startAnimation(animation)
+//            Log.d("anim", "open")
         }
     }
 }
