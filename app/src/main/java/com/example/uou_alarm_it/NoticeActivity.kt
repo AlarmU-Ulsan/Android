@@ -287,7 +287,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
             ViewGroup.LayoutParams.WRAP_CONTENT
         ).apply {
             gravity = Gravity.BOTTOM
-            bottomMargin = dpToPx(82f)
+            bottomMargin = dpToPx(12f)
             leftMargin = dpToPx(12f)
             rightMargin = dpToPx(12f)
         }
