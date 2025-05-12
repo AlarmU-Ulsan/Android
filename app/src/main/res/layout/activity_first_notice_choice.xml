@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="공지를 확인할 전공을\n선택해주세요!"
-            android:textSize="20dp"
+            android:textSize="28dp"
             android:textStyle="bold"
             android:letterSpacing="-0.032"
             android:textColor="@color/black"
