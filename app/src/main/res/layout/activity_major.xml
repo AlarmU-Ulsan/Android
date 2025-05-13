@@ -35,7 +35,6 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:letterSpacing="-0.032"
-                android:textFontWeight="8000"
                 android:layout_marginStart="18dp"/>
 
         </LinearLayout>
