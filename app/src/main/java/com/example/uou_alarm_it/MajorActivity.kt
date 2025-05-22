@@ -93,6 +93,7 @@ class MajorActivity : AppCompatActivity() {
         binding.majorChoiceCollegeRv.apply {
             layoutManager = LinearLayoutManager(this@MajorActivity)
             adapter = collegeAdapter
+            isNestedScrollingEnabled = false
         }
 
         binding.majorBackBtnLl.setOnClickListener {
