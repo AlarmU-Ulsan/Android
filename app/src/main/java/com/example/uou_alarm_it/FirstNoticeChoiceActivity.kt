@@ -78,6 +78,7 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
         binding.firstNoticeChoiceCollegeRv.apply {
             layoutManager = LinearLayoutManager(this@FirstNoticeChoiceActivity)
             adapter = collegeAdapter
+            isNestedScrollingEnabled = false
         }
 
         // "다음" 버튼 클릭 시, 선택한 전공명을 Intent extra로 전달하며 FirstAlarmChoiceActivity 실행

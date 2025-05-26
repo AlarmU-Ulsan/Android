@@ -82,6 +82,7 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         binding.firstAlarmChoiceCollegeRv.apply {
             layoutManager = LinearLayoutManager(this@FirstAlarmChoiceActivity)
             adapter = collegeAdapter
+            isNestedScrollingEnabled = false
         }
 
         binding.firstAlarmBackBtnTv.setOnClickListener {

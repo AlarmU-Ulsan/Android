@@ -210,17 +210,20 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_MAJOR && resultCode == RESULT_OK) {
-            val selectedText = data?.getStringExtra("selectedItem")
+            val selectedText = data?.getStringExtra("selectedItem") ?: return
             val previousMajor = major
-            if (!selectedText.isNullOrEmpty()) {
+            if (selectedText != previousMajor) {
+                // 1) 텍스트, 변수, SharedPreferences 즉시 업데이트
                 binding.noticeSelectedMajorTv.text = selectedText
                 major = selectedText
-                val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-                sharedPref.edit().putString("selected_major", major).apply()
+                getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+                    .edit().putString("selected_major", major).apply()
+
+                // 2) 알림 다이얼로그 먼저 표시
+                showCustomNotification()
+
+                // 3) 그 다음에 탭 새로고침
                 setCategory(category)
-                if (selectedText != previousMajor) {
-                    showCustomNotification()
-                }
             }
         }
     }
