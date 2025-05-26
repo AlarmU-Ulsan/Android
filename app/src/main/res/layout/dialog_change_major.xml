@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:text="공지 채널을 변경해도 새 공지의\n알림을 받는 채널은 변경되지 않아요!"
         android:textColor="@color/white"
-        android:textSize="10dp"
+        android:textSize="11.44dp"
         android:letterSpacing="-0.019"
         android:layout_marginTop="8dp"/>
 
