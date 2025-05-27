@@ -24,6 +24,8 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
     lateinit var setting: Setting
     lateinit var selectMajor: String
 
+    private var searchKeyword: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAlarmChoiceBinding.inflate(layoutInflater)
@@ -45,17 +47,16 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
 
         binding.alarmChoiceEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                var keyWord = binding.alarmChoiceEt.text
-                var colleges: MutableList<College> = mutableListOf()
+                searchKeyword = s.toString().lowercase()
+                val colleges: MutableList<College> = mutableListOf()
 
-                if (keyWord.isEmpty()) {
-                    colleges = collegesList
-                }
-                else {
+                if (searchKeyword.isEmpty()) {
+                    colleges.addAll(collegesList)
+                } else {
                     for (c in collegesList) {
-                        val m = (c.majors.filter { it -> it.lowercase().contains(keyWord) }).toMutableList()
-                        if (m.isNotEmpty()) {
-                            colleges.add(College(c.name, m))
+                        val filteredMajors = c.majors.filter { it.lowercase().contains(searchKeyword) }.toMutableList()
+                        if (filteredMajors.isNotEmpty()) {
+                            colleges.add(College(c.name, filteredMajors))
                         }
                     }
                 }
@@ -136,10 +137,24 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                         else{
                             majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_off)
                         }
-                        majorBinding.root.setOnClickListener{
+                        majorBinding.root.setOnClickListener {
                             selectMajor = major
                             changeMajor(this@AlarmChoiceActivity, selectMajor)
-                            initRV(collegesList)
+
+                            // ✅ 체크 후에도 현재 검색어를 반영한 필터링 리스트로 갱신
+                            val filteredColleges: MutableList<College> = mutableListOf()
+                            if (searchKeyword.isEmpty()) {
+                                filteredColleges.addAll(collegesList)
+                            } else {
+                                for (c in collegesList) {
+                                    val filteredMajors = c.majors.filter { it.lowercase().contains(searchKeyword) }.toMutableList()
+                                    if (filteredMajors.isNotEmpty()) {
+                                        filteredColleges.add(College(c.name, filteredMajors))
+                                    }
+                                }
+                            }
+
+                            initRV(filteredColleges)
                         }
                     }
                 }
