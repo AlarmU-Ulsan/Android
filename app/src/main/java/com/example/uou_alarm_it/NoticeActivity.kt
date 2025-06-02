@@ -340,7 +340,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     private fun initAllTab() {
         page = 0
         noticeList.clear()
-        RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
+        RetrofitClient.service.getNotice(0, page++, major.replace("·", "")).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
@@ -358,7 +358,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     private fun initImportantTab() {
         page = 0
         noticeList.clear()
-        RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
+        RetrofitClient.service.getNotice(0, page++, major.replace("·", "")).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
@@ -465,7 +465,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
                         } else if (!binding.noticeRv.canScrollVertically(1)) {
                             if (!isLoading) {
                                 isLoading = true
-                                RetrofitClient.service.getNotice(category, page++, major)
+                                RetrofitClient.service.getNotice(category, page++, major.replace("·", ""))
                                     .enqueue(object : Callback<GetNoticeResponse> {
                                         override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                                             isLoading = false
@@ -548,7 +548,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
         }
         if (isLoading) return
         isLoading = true
-        RetrofitClient.service.getSearch(keyword, major, page++).enqueue(object : Callback<GetNoticeResponse> {
+        RetrofitClient.service.getSearch(keyword, major.replace("·", ""), page++).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 isLoading = false
                 if (response.body()?.code == "COMMON200") {
