@@ -409,12 +409,6 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
         noticeRVAdapter = NoticeRVAdapter()
         binding.noticeRv.adapter = noticeRVAdapter
 
-        // 복원된 상태가 있다면 적용
-        layoutManagerState?.let {
-            binding.noticeRv.layoutManager?.onRestoreInstanceState(it)
-            layoutManagerState = null // 중복 적용 방지
-        }
-
         noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener {
             override fun onItemClick(notice: Notice) {
                 Log.d("test", "Item")
@@ -444,6 +438,15 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
                 Log.d("Save Bookmark", bookmarkList.toString())
             }
         })
+
+        // ✅ 스크롤 복원은 RecyclerView 렌더링이 끝난 뒤에 해야 정확하게 동작
+        layoutManagerState?.let { state ->
+            binding.noticeRv.post {
+                binding.noticeRv.layoutManager?.onRestoreInstanceState(state)
+                layoutManagerState = null
+            }
+        }
+
         binding.noticeRv.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
