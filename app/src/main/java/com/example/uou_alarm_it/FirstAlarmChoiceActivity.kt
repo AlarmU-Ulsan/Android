@@ -86,9 +86,9 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         }
 
         binding.firstAlarmBackBtnTv.setOnClickListener {
-            // 뒤로가기 버튼 : FirstNoticeChoiceActivity로 돌아감.
             val intent = Intent(this, FirstNoticeChoiceActivity::class.java)
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right) // ✅ 반대 애니메이션
             finish()
         }
 
