@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -67,6 +68,8 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     private val notificationDuration = 5000L // 5초
     private val notificationHandler = Handler(Looper.getMainLooper())
     private var notificationRunnable: Runnable? = null
+
+    private var layoutManagerState: Parcelable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -226,6 +229,17 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
                 setCategory(category)
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        layoutManagerState = binding.noticeRv.layoutManager?.onSaveInstanceState()
+        outState.putParcelable("layout_manager_state", layoutManagerState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        layoutManagerState = savedInstanceState.getParcelable("layout_manager_state")
     }
 
     private fun initNotification() {
@@ -394,6 +408,13 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     fun initRV() {
         noticeRVAdapter = NoticeRVAdapter()
         binding.noticeRv.adapter = noticeRVAdapter
+
+        // 복원된 상태가 있다면 적용
+        layoutManagerState?.let {
+            binding.noticeRv.layoutManager?.onRestoreInstanceState(it)
+            layoutManagerState = null // 중복 적용 방지
+        }
+
         noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener {
             override fun onItemClick(notice: Notice) {
                 Log.d("test", "Item")
