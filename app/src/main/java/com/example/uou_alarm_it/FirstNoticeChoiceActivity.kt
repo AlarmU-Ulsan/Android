@@ -67,6 +67,8 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
         binding = ActivityFirstNoticeChoiceBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        restorePreviousSelection()
+
         // 초기 상태: 전체 리스트 표시
         filteredCollegeList.clear()
         filteredCollegeList.addAll(originalCollegeList)
@@ -91,6 +93,7 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
                     }
                 }
             }
+            saveSelectedMajor()
             if (selectedMajor.isNullOrEmpty()) {
                 // 선택된 항목이 없으면 기본값(첫 전공)을 사용
                 selectedMajor = originalCollegeList.firstOrNull()?.majors?.firstOrNull()?.majorName ?: ""
@@ -99,6 +102,7 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
             sharedPref.edit().putString("selected_major", selectedMajor).apply()
             val intent = Intent(this, FirstAlarmChoiceActivity::class.java)
             startActivity(intent)
+//            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             finish()
         }
 
@@ -146,6 +150,30 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
         } else {
             binding.firstNoticeNextBtnTv.visibility = View.GONE
         }
+    }
+
+    private fun saveSelectedMajor() {
+        val selectedMajor = originalCollegeList
+            .flatMap { it.majors }
+            .find { it.isChecked }
+            ?.majorName ?: return
+
+        val prefs = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        prefs.edit().putString("selected_major", selectedMajor).apply()
+    }
+
+    private fun restorePreviousSelection() {
+        val prefs = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        val selectedMajorName = prefs.getString("selected_major", null)
+
+        if (!selectedMajorName.isNullOrEmpty()) {
+            originalCollegeList.forEach { college ->
+                college.majors.forEach { major ->
+                    major.isChecked = major.majorName == selectedMajorName
+                }
+            }
+        }
+        updateNextButtonVisibility() // ✅ 버튼 상태도 함께 반영!
     }
 
     // 전공명 검색 로직

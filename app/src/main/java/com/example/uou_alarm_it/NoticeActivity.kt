@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -67,6 +68,8 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     private val notificationDuration = 5000L // 5초
     private val notificationHandler = Handler(Looper.getMainLooper())
     private var notificationRunnable: Runnable? = null
+
+    private var layoutManagerState: Parcelable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -228,6 +231,17 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        layoutManagerState = binding.noticeRv.layoutManager?.onSaveInstanceState()
+        outState.putParcelable("layout_manager_state", layoutManagerState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        layoutManagerState = savedInstanceState.getParcelable("layout_manager_state")
+    }
+
     private fun initNotification() {
         if (setting.notificationSetting) {
             binding.noticeNoticeIv.setImageResource(R.drawable.notice_on)
@@ -326,7 +340,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     private fun initAllTab() {
         page = 0
         noticeList.clear()
-        RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
+        RetrofitClient.service.getNotice(0, page++, major.replace("·", "")).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
@@ -344,7 +358,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     private fun initImportantTab() {
         page = 0
         noticeList.clear()
-        RetrofitClient.service.getNotice(0, page++, major).enqueue(object : Callback<GetNoticeResponse> {
+        RetrofitClient.service.getNotice(0, page++, major.replace("·", "")).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 if (response.body()?.code == "COMMON200") {
                     val res = response.body()!!.result
@@ -394,6 +408,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     fun initRV() {
         noticeRVAdapter = NoticeRVAdapter()
         binding.noticeRv.adapter = noticeRVAdapter
+
         noticeRVAdapter.setMyClickListener(object : NoticeRVAdapter.MyClickListener {
             override fun onItemClick(notice: Notice) {
                 Log.d("test", "Item")
@@ -423,6 +438,15 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
                 Log.d("Save Bookmark", bookmarkList.toString())
             }
         })
+
+        // ✅ 스크롤 복원은 RecyclerView 렌더링이 끝난 뒤에 해야 정확하게 동작
+        layoutManagerState?.let { state ->
+            binding.noticeRv.post {
+                binding.noticeRv.layoutManager?.onRestoreInstanceState(state)
+                layoutManagerState = null
+            }
+        }
+
         binding.noticeRv.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -441,7 +465,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
                         } else if (!binding.noticeRv.canScrollVertically(1)) {
                             if (!isLoading) {
                                 isLoading = true
-                                RetrofitClient.service.getNotice(category, page++, major)
+                                RetrofitClient.service.getNotice(category, page++, major.replace("·", ""))
                                     .enqueue(object : Callback<GetNoticeResponse> {
                                         override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                                             isLoading = false
@@ -524,7 +548,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
         }
         if (isLoading) return
         isLoading = true
-        RetrofitClient.service.getSearch(keyword, major, page++).enqueue(object : Callback<GetNoticeResponse> {
+        RetrofitClient.service.getSearch(keyword, major.replace("·", ""), page++).enqueue(object : Callback<GetNoticeResponse> {
             override fun onResponse(call: Call<GetNoticeResponse>, response: Response<GetNoticeResponse>) {
                 isLoading = false
                 if (response.body()?.code == "COMMON200") {
