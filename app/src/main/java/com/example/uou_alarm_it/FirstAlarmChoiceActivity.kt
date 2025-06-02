@@ -141,25 +141,48 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         }
 
         if (selectedCount > 0) {
-            // 버튼이 이미 VISIBLE 상태가 아니면 fade in 애니메이션 적용
-            if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
-                binding.firstAlarmNextBtnTv.visibility = View.VISIBLE
-                val fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
-                binding.firstAlarmNextBtnTv.startAnimation(fadeInAnim)
-            }
+            // "완료" 텍스트 설정
+            binding.firstAlarmNextBtnTv.text = "완료"
         } else {
-            // 버튼이 보이는 상태면 fade out 애니메이션 적용 후 GONE으로 설정
-            if (binding.firstAlarmNextBtnTv.visibility == View.VISIBLE) {
-                val fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_finish_btn)
-                fadeOutAnim.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationStart(animation: Animation?) {}
-                    override fun onAnimationRepeat(animation: Animation?) {}
-                    override fun onAnimationEnd(animation: Animation?) {
-                        binding.firstAlarmNextBtnTv.visibility = View.GONE
-                    }
-                })
-                binding.firstAlarmNextBtnTv.startAnimation(fadeOutAnim)
-            }
+            // "건너뛰기" 텍스트 설정
+            binding.firstAlarmNextBtnTv.text = "건너뛰기"
+        }
+
+        // 항상 보이게
+        if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
+            binding.firstAlarmNextBtnTv.visibility = View.VISIBLE
+            val fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
+            binding.firstAlarmNextBtnTv.startAnimation(fadeInAnim)
         }
     }
+//    private fun updateNextButtonVisibility() {
+//        var selectedCount = 0
+//        originalCollegeList.forEach { college ->
+//            college.majors.forEach { major ->
+//                if (major.isChecked) selectedCount++
+//            }
+//        }
+//
+//        if (selectedCount > 0) {
+//            // 버튼이 이미 VISIBLE 상태가 아니면 fade in 애니메이션 적용
+//            if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
+//                binding.firstAlarmNextBtnTv.visibility = View.VISIBLE
+//                val fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
+//                binding.firstAlarmNextBtnTv.startAnimation(fadeInAnim)
+//            }
+//        } else {
+//            // 버튼이 보이는 상태면 fade out 애니메이션 적용 후 GONE으로 설정
+//            if (binding.firstAlarmNextBtnTv.visibility == View.VISIBLE) {
+//                val fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_finish_btn)
+//                fadeOutAnim.setAnimationListener(object : Animation.AnimationListener {
+//                    override fun onAnimationStart(animation: Animation?) {}
+//                    override fun onAnimationRepeat(animation: Animation?) {}
+//                    override fun onAnimationEnd(animation: Animation?) {
+//                        binding.firstAlarmNextBtnTv.visibility = View.GONE
+//                    }
+//                })
+//                binding.firstAlarmNextBtnTv.startAnimation(fadeOutAnim)
+//            }
+//        }
+//    }
 }
