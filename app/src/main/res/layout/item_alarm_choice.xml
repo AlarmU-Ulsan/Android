@@ -18,8 +18,8 @@
 
     <ImageView
         android:id="@+id/itme_alarm_choice_toggle"
-        android:layout_width="26dp"
-        android:layout_height="29dp"
+        android:layout_width="25dp"
+        android:layout_height="31dp"
         android:src="@drawable/alarm_check_off"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
