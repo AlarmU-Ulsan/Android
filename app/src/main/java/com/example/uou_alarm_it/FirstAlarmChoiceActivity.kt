@@ -81,8 +81,8 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
             collegeAdapter.notifyDataSetChanged()
             updateNextButtonVisibility()
 
-            val selectedMajors = getSelectedMajors().joinToString(",")
-            changeMajor2(this, selectedMajors)
+            val selectedMajors = getSelectedMajors()
+            changeMajor(this, selectedMajors)
         }
 
         binding.firstAlarmChoiceCollegeRv.apply {
@@ -152,12 +152,5 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
         return originalCollegeList.flatMap { college ->
             college.majors.filter { it.isChecked }.map { it.majorName }
         }
-    }
-
-    private fun changeMajor2(context: Context, majors: String) {
-        setFCM(Setting(false, setting.notificationMajor))
-        setting.notificationMajor = majors
-        setFCM(setting)
-        saveSetting(context, setting)
     }
 }

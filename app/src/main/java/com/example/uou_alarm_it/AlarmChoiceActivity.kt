@@ -23,7 +23,7 @@ import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
 class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
     lateinit var binding: ActivityAlarmChoiceBinding
     lateinit var setting: Setting
-    private var selectMajors: MutableSet<String> = mutableSetOf()
+    private var selectMajors: ArrayList<String> = arrayListOf()
     private var searchKeyword: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,11 +33,11 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         initRV(collegesList)
 
         setting = loadSetting(this)
-        selectMajors = setting.notificationMajor.split(",").filter { it.isNotBlank() }.toMutableSet()
+        selectMajors = setting.alarmMajor
         initToggle()
 
         binding.alarmChoiceToggle.setOnClickListener {
-            setting.notificationSetting = changeSetting(this)
+            setting.alarmSetting = changeSetting(this)
             initToggle()
         }
 
@@ -75,7 +75,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
     }
 
     private fun initToggle() {
-        if (setting.notificationSetting) {
+        if (setting.alarmSetting) {
             binding.alarmChoiceToggleOn.visibility = View.VISIBLE
             binding.alarmChoiceToggleOff.visibility = View.GONE
         } else {
@@ -143,7 +143,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                                 selectMajors.add(major)
                             }
 
-                            changeMajor(this@AlarmChoiceActivity, selectMajors.joinToString(","))
+                            changeMajor(this@AlarmChoiceActivity, selectMajors)
 
                             val filteredColleges: MutableList<College> = mutableListOf()
                             if (searchKeyword.isEmpty()) {
@@ -163,11 +163,4 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
             }
         }
     }
-}
-
-fun changeMajor(context: Context, majors: String) {
-    val pref = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
-    val editor = pref.edit()
-    editor.putString("notificationMajor", majors)
-    editor.apply()
 }

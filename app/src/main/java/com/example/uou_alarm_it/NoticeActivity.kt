@@ -112,15 +112,15 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
 
         // 초기 플로우가 완료되었거나 Intent extra가 있는 경우:
         // 최초 실행 시 Intent extra가 있으면 우선 적용 (그리고 플래그는 이미 true)
-        major = if (!intentMajor.isNullOrEmpty() && setting.notificationMajor == defaultMajor) {
+        major = if (!intentMajor.isNullOrEmpty() && setting.noiceMajor == defaultMajor) {
             intent.removeExtra("major")
             intentMajor
         } else {
-            spMajor ?: setting.notificationMajor
+            spMajor ?: setting.noiceMajor
         }
 
         // 업데이트된 major 값을 setting에 반영하고 저장
-        setting.notificationMajor = major
+        setting.noiceMajor = major
         saveSetting(this, setting)
 
         Log.d("NoticeActivity", "최종 major 값: $major")
@@ -243,7 +243,7 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
     }
 
     private fun initNotification() {
-        if (setting.notificationSetting) {
+        if (setting.alarmSetting) {
             binding.noticeNoticeIv.setImageResource(R.drawable.notice_on)
         } else {
             binding.noticeNoticeIv.setImageResource(R.drawable.notice_off)

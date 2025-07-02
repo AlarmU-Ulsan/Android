@@ -26,14 +26,12 @@ interface RetrofitService {
 
     @POST("/fcm/subscribe")
     fun postFCMRegister(
-        @Query("token") token: String,
-        @Query("major") major: String
-    ): Call<PostFCMTokenResponse>
+        @Body request: FCMSubscribeRequest
+    ): Call<PostFCMSubscribeResponse>
 
-    @DELETE("/fcm/subscribe")
+    @HTTP(method = "DELETE", path = "/fcm/subscribe", hasBody = true) // DELETE에서 Body를 사용하려면 이렇게 해야 함.
     fun deleteFCMUnregister(
-        @Query("token") token: String,
-        @Query("major") major: String
+        @Body request: FCMSubscribeRequest
     ): Call<PostFCMResponse>
 
     @GET("/api/version/android")

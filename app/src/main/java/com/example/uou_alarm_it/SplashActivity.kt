@@ -15,7 +15,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SplashActivity : AppCompatActivity(), UpdateDialogInterface {
+class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterface {
     private lateinit var binding: ActivitySplashBinding
 
     companion object {
@@ -49,37 +49,7 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface {
         }
 
         // ✅ FCM 토큰 발급 및 서버 전송
-        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.e(APP_FLOW_TAG, "FCM 토큰 가져오기 실패", task.exception)
-                return@addOnCompleteListener
-            }
-
-            val fcmToken = task.result ?: ""
-            Log.d(APP_FLOW_TAG, "FCM 토큰: $fcmToken")
-
-            val request = PostFCMTokenRequest(
-                deviceId = deviceId,
-                fcmToken = fcmToken
-            )
-            RetrofitClient.service.postFCMToken(request)
-                .enqueue(object : Callback<PostFCMResponse> {
-                    override fun onResponse(
-                        call: Call<PostFCMResponse>,
-                        response: Response<PostFCMResponse>
-                    ) {
-                        if (response.isSuccessful && response.body()?.isSuccess == true) {
-                            Log.d(APP_FLOW_TAG, "FCM 등록 성공: ${response.body()?.message}")
-                        } else {
-                            Log.e(APP_FLOW_TAG, "FCM 등록 실패: ${response.errorBody()?.string()}")
-                        }
-                    }
-
-                    override fun onFailure(call: Call<PostFCMResponse>, t: Throwable) {
-                        Log.e(APP_FLOW_TAG, "FCM 등록 실패: ${t.message}")
-                    }
-                })
-        }
+        setFCM(this)
 
         RetrofitClient.service.getVersion().enqueue(object : Callback<GetVersionResponse> {
             override fun onResponse(
