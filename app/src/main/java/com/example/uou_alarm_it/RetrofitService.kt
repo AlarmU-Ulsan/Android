@@ -19,17 +19,22 @@ interface RetrofitService {
         @Query("page") page: Int // default: 0/ 가져올 페이지의 번호
     ): Call<GetNoticeResponse>
 
-    @POST("/fcm/register")
+    @POST("/fcm/fcm_token")
+    fun postFCMToken(
+        @Body request: PostFCMTokenRequest
+    ): Call<PostFCMResponse>
+
+    @POST("/fcm/subscribe")
     fun postFCMRegister(
         @Query("token") token: String,
         @Query("major") major: String
-    ): Call<PostFCMRegisterResponse>
+    ): Call<PostFCMTokenResponse>
 
-    @DELETE("/fcm/unregister")
+    @DELETE("/fcm/subscribe")
     fun deleteFCMUnregister(
         @Query("token") token: String,
         @Query("major") major: String
-    ): Call<PostFCMRegisterResponse>
+    ): Call<PostFCMResponse>
 
     @GET("/api/version/android")
     fun getVersion(): Call<GetVersionResponse>

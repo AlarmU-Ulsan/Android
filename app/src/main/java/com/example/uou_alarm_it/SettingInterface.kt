@@ -40,14 +40,14 @@ interface SettingInterface{
         return setting.notificationSetting
     }
 
-    fun changeMajor(context: Context, major: String) {
-        var setting = loadSetting(context)
+    fun changeMajor(context: Context, majors: String) {
+        val setting = loadSetting(context)
 
         // 기존 알림 해제
         setFCM(Setting(false, setting.notificationMajor))
 
-        // 알림 전공 변경
-        setting.notificationMajor = major
+        // 알림 전공 변경 (콤마로 구분된 복수 전공)
+        setting.notificationMajor = majors
         setFCM(setting)
 
         saveSetting(context, setting)
@@ -65,28 +65,28 @@ interface SettingInterface{
 
                 if (setting.notificationSetting) {
                     RetrofitClient.service.postFCMRegister(token, setting.notificationMajor).enqueue(object:
-                        Callback<PostFCMRegisterResponse> {
+                        Callback<PostFCMTokenResponse> {
                         override fun onResponse(
-                            call: Call<PostFCMRegisterResponse>,
-                            response: Response<PostFCMRegisterResponse>
+                            call: Call<PostFCMTokenResponse>,
+                            response: Response<PostFCMTokenResponse>
                         ) {
                             Log.d("FCM", "FCM 연결 성공")
                         }
-                        override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<PostFCMTokenResponse>, t: Throwable) {
                             Log.e("FCM", "FCM 연결 실패" + t)
                         }
                     })
                 }
                 else {
                     RetrofitClient.service.deleteFCMUnregister(token, setting.notificationMajor).enqueue(object:
-                        Callback<PostFCMRegisterResponse> {
+                        Callback<PostFCMResponse> {
                         override fun onResponse(
-                            call: Call<PostFCMRegisterResponse>,
-                            response: Response<PostFCMRegisterResponse>
+                            call: Call<PostFCMResponse>,
+                            response: Response<PostFCMResponse>
                         ) {
                             Log.d("FCM", "FCM 연결 해제 성공")
                         }
-                        override fun onFailure(call: Call<PostFCMRegisterResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<PostFCMResponse>, t: Throwable) {
                             Log.e("FCM", "FCM 연결 해제 실패" + t)
                         }
                     })
