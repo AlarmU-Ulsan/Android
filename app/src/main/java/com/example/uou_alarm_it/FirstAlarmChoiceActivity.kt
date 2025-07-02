@@ -16,11 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.uou_alarm_it.databinding.ActivityFirstAlarmChoiceBinding
 import com.example.uou_alarm_it.databinding.ActivityFirstNoticeChoiceBinding
 
-class FirstAlarmChoiceActivity : AppCompatActivity() {
+class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
 
     private lateinit var binding: ActivityFirstAlarmChoiceBinding
 
-    // 원본 데이터 (단과대학 및 전공 목록)
+    lateinit var setting: Setting
+
     private val originalCollegeList = mutableListOf(
         College("미래엔지니어링융합대학", mutableListOf(
             Major("ICT융합학부"),
@@ -56,11 +57,8 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         ))
     )
 
-    // 검색 후 표시할 리스트 (초기에는 전체 데이터)
     private val filteredCollegeList = mutableListOf<College>()
 
-    // 상위 RecyclerView 어댑터 (CollegeAlarmAdapter는 내부에서 전공 선택 시
-    // 체크박스(혹은 이미지뷰) 토글 등 멀티 셀렉트를 구현한다고 가정)
     private lateinit var collegeAdapter: CollegeAlarmAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,15 +66,23 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         binding = ActivityFirstAlarmChoiceBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 초기 상태: 전체 리스트 표시
+        setting = loadSetting(this)
+
         filteredCollegeList.clear()
         filteredCollegeList.addAll(originalCollegeList)
 
-        // 어댑터 생성 (전공 클릭 시 단순 토글 처리)
         collegeAdapter = CollegeAlarmAdapter(filteredCollegeList) { selectedMajor ->
+            val checkedCount = getCheckedMajorsCount()
+            if (!selectedMajor.isChecked && checkedCount >= 2) {
+                return@CollegeAlarmAdapter
+            }
+
             selectedMajor.isChecked = !selectedMajor.isChecked
             collegeAdapter.notifyDataSetChanged()
             updateNextButtonVisibility()
+
+            val selectedMajors = getSelectedMajors().joinToString(",")
+            changeMajor2(this, selectedMajors)
         }
 
         binding.firstAlarmChoiceCollegeRv.apply {
@@ -88,12 +94,11 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
         binding.firstAlarmBackBtnTv.setOnClickListener {
             val intent = Intent(this, FirstNoticeChoiceActivity::class.java)
             startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right) // ✅ 반대 애니메이션
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
             finish()
         }
 
         binding.firstAlarmNextBtnTv.setOnClickListener {
-            // 사용자가 "다음" 버튼을 클릭하면, 초기 플로우 완료 플래그를 true로 저장하여 NoticeActivity로 전환합니다.
             val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
             sharedPref.edit().putBoolean("isInitialFlowComplete", true).apply()
             val intent = Intent(this, NoticeActivity::class.java)
@@ -101,7 +106,6 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
             finish()
         }
 
-        // 검색 EditText 관련 로직
         binding.firstAlarmSearchEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 filterMajors(s.toString())
@@ -120,69 +124,40 @@ class FirstAlarmChoiceActivity : AppCompatActivity() {
             for (college in originalCollegeList) {
                 val matchedMajors = college.majors.filter { it.majorName.lowercase().contains(trimmedQuery) }
                 if (matchedMajors.isNotEmpty()) {
-                    val filteredCollege = College(
-                        collegeName = college.collegeName,
-                        majors = matchedMajors.toMutableList()
-                    )
-                    filteredCollegeList.add(filteredCollege)
+                    filteredCollegeList.add(College(college.collegeName, matchedMajors.toMutableList()))
                 }
             }
         }
         collegeAdapter.notifyDataSetChanged()
     }
 
-    // 선택된 전공(알림 채널)이 1개 이상이면 "다음" 버튼을 VISIBLE, 아니면 GONE으로 설정
     private fun updateNextButtonVisibility() {
-        var selectedCount = 0
-        originalCollegeList.forEach { college ->
-            college.majors.forEach { major ->
-                if (major.isChecked) selectedCount++
-            }
-        }
+        val selectedCount = getCheckedMajorsCount()
+        binding.firstAlarmNextBtnTv.text = if (selectedCount > 0) "완료" else "건너뛰기"
 
-        if (selectedCount > 0) {
-            // "완료" 텍스트 설정
-            binding.firstAlarmNextBtnTv.text = "완료"
-        } else {
-            // "건너뛰기" 텍스트 설정
-            binding.firstAlarmNextBtnTv.text = "건너뛰기"
-        }
-
-        // 항상 보이게
         if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
             binding.firstAlarmNextBtnTv.visibility = View.VISIBLE
             val fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
             binding.firstAlarmNextBtnTv.startAnimation(fadeInAnim)
         }
     }
-//    private fun updateNextButtonVisibility() {
-//        var selectedCount = 0
-//        originalCollegeList.forEach { college ->
-//            college.majors.forEach { major ->
-//                if (major.isChecked) selectedCount++
-//            }
-//        }
-//
-//        if (selectedCount > 0) {
-//            // 버튼이 이미 VISIBLE 상태가 아니면 fade in 애니메이션 적용
-//            if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
-//                binding.firstAlarmNextBtnTv.visibility = View.VISIBLE
-//                val fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_finish_btn)
-//                binding.firstAlarmNextBtnTv.startAnimation(fadeInAnim)
-//            }
-//        } else {
-//            // 버튼이 보이는 상태면 fade out 애니메이션 적용 후 GONE으로 설정
-//            if (binding.firstAlarmNextBtnTv.visibility == View.VISIBLE) {
-//                val fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_finish_btn)
-//                fadeOutAnim.setAnimationListener(object : Animation.AnimationListener {
-//                    override fun onAnimationStart(animation: Animation?) {}
-//                    override fun onAnimationRepeat(animation: Animation?) {}
-//                    override fun onAnimationEnd(animation: Animation?) {
-//                        binding.firstAlarmNextBtnTv.visibility = View.GONE
-//                    }
-//                })
-//                binding.firstAlarmNextBtnTv.startAnimation(fadeOutAnim)
-//            }
-//        }
-//    }
+
+    private fun getCheckedMajorsCount(): Int {
+        return originalCollegeList.sumOf { college ->
+            college.majors.count { it.isChecked }
+        }
+    }
+
+    private fun getSelectedMajors(): List<String> {
+        return originalCollegeList.flatMap { college ->
+            college.majors.filter { it.isChecked }.map { it.majorName }
+        }
+    }
+
+    private fun changeMajor2(context: Context, majors: String) {
+        setFCM(Setting(false, setting.notificationMajor))
+        setting.notificationMajor = majors
+        setFCM(setting)
+        saveSetting(context, setting)
+    }
 }

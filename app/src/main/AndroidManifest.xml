@@ -10,9 +10,9 @@
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/icon_beta"
+        android:icon="@drawable/icon_alarmyu"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/icon_beta"
+        android:roundIcon="@drawable/icon_alarmyu"
         android:supportsRtl="true"
         android:theme="@style/Theme.UOUAlarmit">
         <activity
@@ -24,7 +24,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/notice_icon" />
+            android:resource="@drawable/icon_alarmyu" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/white" />

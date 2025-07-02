@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -17,6 +18,12 @@ import retrofit2.Response
 class SplashActivity : AppCompatActivity(), UpdateDialogInterface {
     private lateinit var binding: ActivitySplashBinding
 
+    companion object {
+        const val DEVICE_ID_KEY = "device_id"
+        const val PREF_NAME = "app_preferences"
+        const val APP_FLOW_TAG = "AppFlow"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
@@ -27,6 +34,53 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface {
         binding.splashVersionTv.text = version
 
         var link = ""
+
+        // 기기 고유 ID 가져오기 및 저장
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        if (deviceId.isNullOrEmpty()) {
+            Log.e(APP_FLOW_TAG, "ANDROID_ID 없음.")
+            Log.d("deviceId", "device 정보 없음")
+            finish()
+            return
+        } else {
+            Log.d(APP_FLOW_TAG, "기기 ID: $deviceId")
+            val sharedPref = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+            sharedPref.edit().putString(DEVICE_ID_KEY, deviceId).apply()
+        }
+
+        // ✅ FCM 토큰 발급 및 서버 전송
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.e(APP_FLOW_TAG, "FCM 토큰 가져오기 실패", task.exception)
+                return@addOnCompleteListener
+            }
+
+            val fcmToken = task.result ?: ""
+            Log.d(APP_FLOW_TAG, "FCM 토큰: $fcmToken")
+
+            val request = PostFCMTokenRequest(
+                deviceId = deviceId,
+                fcmToken = fcmToken
+            )
+            RetrofitClient.service.postFCMToken(request)
+                .enqueue(object : Callback<PostFCMResponse> {
+                    override fun onResponse(
+                        call: Call<PostFCMResponse>,
+                        response: Response<PostFCMResponse>
+                    ) {
+                        if (response.isSuccessful && response.body()?.isSuccess == true) {
+                            Log.d(APP_FLOW_TAG, "FCM 등록 성공: ${response.body()?.message}")
+                        } else {
+                            Log.e(APP_FLOW_TAG, "FCM 등록 실패: ${response.errorBody()?.string()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<PostFCMResponse>, t: Throwable) {
+                        Log.e(APP_FLOW_TAG, "FCM 등록 실패: ${t.message}")
+                    }
+                })
+        }
+
         RetrofitClient.service.getVersion().enqueue(object : Callback<GetVersionResponse> {
             override fun onResponse(
                 call: Call<GetVersionResponse>,

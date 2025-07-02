@@ -44,7 +44,7 @@
             android:id="@+id/first_alarm_notice_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="새로운 공지가 올라오면 알림을 보내드려요\n알림채널은 언제든지 또 변경할 수 있어요"
+            android:text="알림채널은 언제든지 또 변경할 수 있어요\n최대 2개까지 설정할 수 있어요!"
             android:textSize="12dp"
             android:letterSpacing="-0.026"
             app:layout_constraintTop_toBottomOf="@id/first_alarm_title_tv"
@@ -76,7 +76,7 @@
             android:textSize="15dp"
             android:letterSpacing="-0.032"
             app:layout_constraintTop_toBottomOf="@id/first_alarm_notice_tv"
-            android:layout_marginTop="50dp"/>
+            android:layout_marginTop="35dp"/>
 
         <TextView
             android:id="@+id/first_alarm_search_btn_tv"

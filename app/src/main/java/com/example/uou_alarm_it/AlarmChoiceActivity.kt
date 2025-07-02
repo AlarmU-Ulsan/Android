@@ -1,5 +1,6 @@
 package com.example.uou_alarm_it
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,8 +23,7 @@ import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
 class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
     lateinit var binding: ActivityAlarmChoiceBinding
     lateinit var setting: Setting
-    lateinit var selectMajor: String
-
+    private var selectMajors: MutableSet<String> = mutableSetOf()
     private var searchKeyword: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +33,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         initRV(collegesList)
 
         setting = loadSetting(this)
-        selectMajor = setting.notificationMajor
+        selectMajors = setting.notificationMajor.split(",").filter { it.isNotBlank() }.toMutableSet()
         initToggle()
 
         binding.alarmChoiceToggle.setOnClickListener {
@@ -68,7 +68,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         })
     }
 
-    private fun initRV(colleges: MutableList<CollegesList.College>) {
+    private fun initRV(colleges: MutableList<College>) {
         val collegeRVAdapter = CollegeRVAdapter(colleges)
         binding.alarmChoiceRv.adapter = collegeRVAdapter
         binding.alarmChoiceRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -78,8 +78,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         if (setting.notificationSetting) {
             binding.alarmChoiceToggleOn.visibility = View.VISIBLE
             binding.alarmChoiceToggleOff.visibility = View.GONE
-        }
-        else {
+        } else {
             binding.alarmChoiceToggleOn.visibility = View.GONE
             binding.alarmChoiceToggleOff.visibility = View.VISIBLE
         }
@@ -87,19 +86,19 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
 
     inner class CollegeRVAdapter(private val colleges: MutableList<College>): RecyclerView.Adapter<CollegeRVAdapter.ViewHolder>() {
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollegeRVAdapter.ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val collegeBinding = ItemAlarmChoiceCollegeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return ViewHolder(collegeBinding)
         }
 
-        override fun onBindViewHolder(holder: CollegeRVAdapter.ViewHolder, collegePos: Int) {
-            holder.bind(colleges[collegePos])
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(colleges[position])
         }
 
         override fun getItemCount(): Int = colleges.size
 
         inner class ViewHolder(private val collegeBinding: ItemAlarmChoiceCollegeBinding): RecyclerView.ViewHolder(collegeBinding.root) {
-            fun bind(college: CollegesList.College) {
+            fun bind(college: College) {
                 collegeBinding.itemAlarmChoiceCollegeTitle.text = college.name
                 initCollege(college)
             }
@@ -108,21 +107,17 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                 val majorRVAdapter = MajorRVAdapter(college)
                 collegeBinding.itemAlarmChoiceCollegeRv.adapter = majorRVAdapter
                 collegeBinding.itemAlarmChoiceCollegeRv.layoutManager = LinearLayoutManager(this@AlarmChoiceActivity, LinearLayoutManager.VERTICAL, false)
-
             }
 
             inner class MajorRVAdapter(private val college: College): RecyclerView.Adapter<MajorRVAdapter.ViewHolder>() {
-                val majors = college.majors
+                private val majors = college.majors
 
-                override fun onCreateViewHolder(
-                    parent: ViewGroup,
-                    viewType: Int
-                ): MajorRVAdapter.ViewHolder {
+                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
                     val majorBinding = ItemAlarmChoiceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                     return ViewHolder(majorBinding)
                 }
 
-                override fun onBindViewHolder(holder: MajorRVAdapter.ViewHolder, position: Int) {
+                override fun onBindViewHolder(holder: ViewHolder, position: Int) {
                     holder.bind(majors[position])
                 }
 
@@ -131,17 +126,25 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                 inner class ViewHolder(private val majorBinding: ItemAlarmChoiceBinding): RecyclerView.ViewHolder(majorBinding.root) {
                     fun bind(major: String) {
                         majorBinding.itemAlarmChoiceTitle.text = major
-                        if(major == selectMajor) {
+
+                        if (selectMajors.contains(major)) {
                             majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_on)
-                        }
-                        else{
+                        } else {
                             majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_off)
                         }
-                        majorBinding.root.setOnClickListener {
-                            selectMajor = major
-                            changeMajor(this@AlarmChoiceActivity, selectMajor)
 
-                            // ✅ 체크 후에도 현재 검색어를 반영한 필터링 리스트로 갱신
+                        majorBinding.root.setOnClickListener {
+                            if (selectMajors.contains(major)) {
+                                selectMajors.remove(major)
+                            } else {
+                                if (selectMajors.size >= 2) {
+                                    return@setOnClickListener
+                                }
+                                selectMajors.add(major)
+                            }
+
+                            changeMajor(this@AlarmChoiceActivity, selectMajors.joinToString(","))
+
                             val filteredColleges: MutableList<College> = mutableListOf()
                             if (searchKeyword.isEmpty()) {
                                 filteredColleges.addAll(collegesList)
@@ -153,7 +156,6 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                                     }
                                 }
                             }
-
                             initRV(filteredColleges)
                         }
                     }
@@ -161,4 +163,11 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
             }
         }
     }
+}
+
+fun changeMajor(context: Context, majors: String) {
+    val pref = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
+    val editor = pref.edit()
+    editor.putString("notificationMajor", majors)
+    editor.apply()
 }

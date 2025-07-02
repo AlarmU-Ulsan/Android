@@ -252,11 +252,20 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
 
     private fun updateEmptyState() {
         if (noticeList.isEmpty()) {
-            binding.noticeEmptyLogoIv.visibility = View.VISIBLE
             binding.noticeRv.visibility = View.GONE
+            if (category == 3) {
+                // 북마크 탭이면 텍스트만 보여줌
+                binding.noticeEmptyLogoIv.visibility = View.GONE
+                binding.noticeEmptyTextTv.visibility = View.VISIBLE
+            } else {
+                // 나머지 탭은 이미지 보여줌
+                binding.noticeEmptyLogoIv.visibility = View.VISIBLE
+                binding.noticeEmptyTextTv.visibility = View.GONE
+            }
         } else {
-            binding.noticeEmptyLogoIv.visibility = View.GONE
             binding.noticeRv.visibility = View.VISIBLE
+            binding.noticeEmptyLogoIv.visibility = View.GONE
+            binding.noticeEmptyTextTv.visibility = View.GONE
         }
     }
 
