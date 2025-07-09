@@ -43,10 +43,10 @@ class FirstNoticeChoiceActivity : AppCompatActivity() {
             Major("글로벌인문학부"),
             Major("예술학부")
         )),
-        College("의과대학", mutableListOf(
-//            Major("의예과[의학과]"),
-            Major("간호학과")
-        )),
+//        College("의과대학", mutableListOf(
+////            Major("의예과[의학과]"),
+////            Major("간호학과")
+//        )),
         College("아산아너스칼리지", mutableListOf(
             Major("자율전공학부")
         )),
