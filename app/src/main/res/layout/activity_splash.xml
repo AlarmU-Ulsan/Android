@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:textSize="11dp"
         android:textColor="@color/gray45"
-        android:text="1.0.1"
+        android:text="버전정보"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
