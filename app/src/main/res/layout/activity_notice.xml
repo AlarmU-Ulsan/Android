@@ -225,17 +225,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-    
-    <ImageView
-        android:id="@+id/notice_empty_logo_iv"
-        android:layout_width="191.7dp"
-        android:layout_height="115.5dp"
-        android:src="@drawable/img_empty_logo"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/notice_empty_text_tv"
@@ -244,7 +233,6 @@
         android:text="북마크된 공지가 없습니다"
         android:textSize="16.5dp"
         android:textColor="#9c9c9c"
-        android:letterSpacing="-0.03"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
