@@ -57,7 +57,7 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
                 response: Response<GetVersionResponse>
             ) {
                 if (response.code() == 200 && response.body()?.result != null) {
-                    if (response.body()!!.result.latestVersion == version) {
+                    if (response.body()!!.result.latestVersion <= version) {
                         // 버전이 최신이면
                         intent?.extras?.let {
                             link = it.getString("link") ?: ""
