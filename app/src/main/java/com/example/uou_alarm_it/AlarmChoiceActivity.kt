@@ -23,8 +23,9 @@ import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
 class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
     lateinit var binding: ActivityAlarmChoiceBinding
     lateinit var setting: Setting
-    private var selectMajors: ArrayList<String> = arrayListOf()
+
     private var searchKeyword: String = ""
+    private var alarmCollegeList = collegesList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +34,6 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         initRV(collegesList)
 
         setting = loadSetting(this)
-        selectMajors = setting.alarmMajor
         initToggle()
 
         binding.alarmChoiceToggle.setOnClickListener {
@@ -48,20 +48,20 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
         binding.alarmChoiceEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 searchKeyword = s.toString().lowercase()
-                val colleges: MutableList<College> = mutableListOf()
+                alarmCollegeList = mutableListOf()
 
                 if (searchKeyword.isEmpty()) {
-                    colleges.addAll(collegesList)
+                    alarmCollegeList.addAll(collegesList)
                 } else {
                     for (c in collegesList) {
-                        val filteredMajors = c.majors.filter { it.lowercase().contains(searchKeyword) }.toMutableList()
+                        val filteredMajors = c.majors.filter { it.name.lowercase().contains(searchKeyword) }.toMutableList()
                         if (filteredMajors.isNotEmpty()) {
-                            colleges.add(College(c.name, filteredMajors))
+                            alarmCollegeList.add(College(c.name, filteredMajors))
                         }
                     }
                 }
 
-                initRV(colleges)
+                initRV(alarmCollegeList)
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -99,8 +99,13 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
 
         inner class ViewHolder(private val collegeBinding: ItemAlarmChoiceCollegeBinding): RecyclerView.ViewHolder(collegeBinding.root) {
             fun bind(college: College) {
-                collegeBinding.itemAlarmChoiceCollegeTitle.text = college.name
-                initCollege(college)
+                if (college.enable) {
+                    collegeBinding.itemAlarmChoiceCollegeTitle.text = college.name
+                    initCollege(college)
+                }
+                else {
+                    collegeBinding.root.visibility = View.GONE
+                }
             }
 
             fun initCollege(college: College) {
@@ -109,7 +114,7 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                 collegeBinding.itemAlarmChoiceCollegeRv.layoutManager = LinearLayoutManager(this@AlarmChoiceActivity, LinearLayoutManager.VERTICAL, false)
             }
 
-            inner class MajorRVAdapter(private val college: College): RecyclerView.Adapter<MajorRVAdapter.ViewHolder>() {
+            inner class MajorRVAdapter(private val college: CollegesList.College): RecyclerView.Adapter<MajorRVAdapter.ViewHolder>() {
                 private val majors = college.majors
 
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -124,39 +129,28 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                 override fun getItemCount(): Int = majors.size
 
                 inner class ViewHolder(private val majorBinding: ItemAlarmChoiceBinding): RecyclerView.ViewHolder(majorBinding.root) {
-                    fun bind(major: String) {
-                        majorBinding.itemAlarmChoiceTitle.text = major
+                    fun bind(major: CollegesList.Major) {
+                        majorBinding.itemAlarmChoiceTitle.text = major.name
 
-                        if (selectMajors.contains(major)) {
+                        if (setting.alarmMajor.contains(major.name)) {
                             majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_on)
                         } else {
                             majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_off)
                         }
 
                         majorBinding.root.setOnClickListener {
-                            if (selectMajors.contains(major)) {
-                                selectMajors.remove(major)
+                            if (setting.alarmMajor.contains(major.name)) {
+                                setting.alarmMajor.remove(major.name)
                             } else {
-                                if (selectMajors.size >= 2) {
-                                    return@setOnClickListener
+                                if (setting.alarmMajor.size >= 2) {
+                                    setting.alarmMajor = arrayListOf(setting.alarmMajor.get(1))
                                 }
-                                selectMajors.add(major)
+                                setting.alarmMajor.add(major.name)
                             }
 
-                            changeMajor(this@AlarmChoiceActivity, selectMajors)
+                            saveSetting(this@AlarmChoiceActivity, setting)
 
-                            val filteredColleges: MutableList<College> = mutableListOf()
-                            if (searchKeyword.isEmpty()) {
-                                filteredColleges.addAll(collegesList)
-                            } else {
-                                for (c in collegesList) {
-                                    val filteredMajors = c.majors.filter { it.lowercase().contains(searchKeyword) }.toMutableList()
-                                    if (filteredMajors.isNotEmpty()) {
-                                        filteredColleges.add(College(c.name, filteredMajors))
-                                    }
-                                }
-                            }
-                            initRV(filteredColleges)
+                            initRV(this@AlarmChoiceActivity.alarmCollegeList)
                         }
                     }
                 }

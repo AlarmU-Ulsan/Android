@@ -255,16 +255,15 @@ class NoticeActivity : AppCompatActivity(), SettingInterface {
             binding.noticeRv.visibility = View.GONE
             if (category == 3) {
                 // 북마크 탭이면 텍스트만 보여줌
-                binding.noticeEmptyLogoIv.visibility = View.GONE
                 binding.noticeEmptyTextTv.visibility = View.VISIBLE
+                binding.noticeEmptyTextTv.text = "북마크된 공지가 없습니다"
             } else {
                 // 나머지 탭은 이미지 보여줌
-                binding.noticeEmptyLogoIv.visibility = View.VISIBLE
-                binding.noticeEmptyTextTv.visibility = View.GONE
+                binding.noticeEmptyTextTv.visibility = View.VISIBLE
+                binding.noticeEmptyTextTv.text = "공지가 없습니다"
             }
         } else {
             binding.noticeRv.visibility = View.VISIBLE
-            binding.noticeEmptyLogoIv.visibility = View.GONE
             binding.noticeEmptyTextTv.visibility = View.GONE
         }
     }

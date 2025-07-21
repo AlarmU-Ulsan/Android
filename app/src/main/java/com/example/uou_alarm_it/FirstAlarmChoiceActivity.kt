@@ -5,16 +5,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.Animation
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.uou_alarm_it.CollegesList.College
+import com.example.uou_alarm_it.CollegesList.collegesList
 import com.example.uou_alarm_it.databinding.ActivityFirstAlarmChoiceBinding
-import com.example.uou_alarm_it.databinding.ActivityFirstNoticeChoiceBinding
+import com.example.uou_alarm_it.databinding.ItemAlarmChoiceBinding
+import com.example.uou_alarm_it.databinding.ItemAlarmChoiceCollegeBinding
 
 class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
 
@@ -22,44 +24,8 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
 
     lateinit var setting: Setting
 
-    private val originalCollegeList = mutableListOf(
-        College("미래엔지니어링융합대학", mutableListOf(
-            Major("ICT융합학부"),
-            Major("미래모빌리티공학부"),
-//            Major("에너지화학공학부"),
-            Major("신소재·반도체융합학부"),
-            Major("전기전자융합학부"),
-//            Major("바이오메디컬헬스학부")
-        )),
-        College("스마트도시융합대학", mutableListOf(
-            Major("건축·도시환경학부"),
-            Major("디자인융합학부"),
-            Major("스포츠과학부")
-        )),
-        College("경영·공공정책대학", mutableListOf(
-//            Major("공공인재학부"),
-            Major("경영경제융합학부")
-        )),
-        College("인문예술대학", mutableListOf(
-            Major("글로벌인문학부"),
-            Major("예술학부")
-        )),
-//        College("의과대학", mutableListOf(
-////            Major("의예과[의학과]"),
-////            Major("간호학과")
-//        )),
-        College("아산아너스칼리지", mutableListOf(
-            Major("자율전공학부")
-        )),
-        College("IT융합학부", mutableListOf(
-            Major("IT융합전공"),
-            Major("AI융합전공")
-        ))
-    )
-
-    private val filteredCollegeList = mutableListOf<College>()
-
-    private lateinit var collegeAdapter: CollegeAlarmAdapter
+    private var searchKeyword: String = ""
+    private var alarmCollegeList = collegesList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,28 +34,7 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
 
         setting = loadSetting(this)
 
-        filteredCollegeList.clear()
-        filteredCollegeList.addAll(originalCollegeList)
-
-        collegeAdapter = CollegeAlarmAdapter(filteredCollegeList) { selectedMajor ->
-            val checkedCount = getCheckedMajorsCount()
-            if (!selectedMajor.isChecked && checkedCount >= 2) {
-                return@CollegeAlarmAdapter
-            }
-
-            selectedMajor.isChecked = !selectedMajor.isChecked
-            collegeAdapter.notifyDataSetChanged()
-            updateNextButtonVisibility()
-
-            val selectedMajors = getSelectedMajors()
-            changeMajor(this, selectedMajors)
-        }
-
-        binding.firstAlarmChoiceCollegeRv.apply {
-            layoutManager = LinearLayoutManager(this@FirstAlarmChoiceActivity)
-            adapter = collegeAdapter
-            isNestedScrollingEnabled = false
-        }
+        initRV(alarmCollegeList)
 
         binding.firstAlarmBackBtnTv.setOnClickListener {
             val intent = Intent(this, FirstNoticeChoiceActivity::class.java)
@@ -108,31 +53,29 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
 
         binding.firstAlarmSearchEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                filterMajors(s.toString())
+                searchKeyword = s.toString().lowercase()
+                alarmCollegeList = mutableListOf()
+
+                if (searchKeyword.isEmpty()) {
+                    alarmCollegeList.addAll(collegesList)
+                } else {
+                    for (c in collegesList) {
+                        val filteredMajors = c.majors.filter { it.name.lowercase().contains(searchKeyword) }.toMutableList()
+                        if (filteredMajors.isNotEmpty()) {
+                            alarmCollegeList.add(College(c.name, filteredMajors))
+                        }
+                    }
+                }
+
+                initRV(alarmCollegeList)
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
 
-    private fun filterMajors(query: String) {
-        val trimmedQuery = query.trim().lowercase()
-        filteredCollegeList.clear()
-        if (trimmedQuery.isEmpty()) {
-            filteredCollegeList.addAll(originalCollegeList)
-        } else {
-            for (college in originalCollegeList) {
-                val matchedMajors = college.majors.filter { it.majorName.lowercase().contains(trimmedQuery) }
-                if (matchedMajors.isNotEmpty()) {
-                    filteredCollegeList.add(College(college.collegeName, matchedMajors.toMutableList()))
-                }
-            }
-        }
-        collegeAdapter.notifyDataSetChanged()
-    }
-
     private fun updateNextButtonVisibility() {
-        val selectedCount = getCheckedMajorsCount()
+        val selectedCount = setting.alarmMajor.size
         binding.firstAlarmNextBtnTv.text = if (selectedCount > 0) "완료" else "건너뛰기"
 
         if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
@@ -142,15 +85,84 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
         }
     }
 
-    private fun getCheckedMajorsCount(): Int {
-        return originalCollegeList.sumOf { college ->
-            college.majors.count { it.isChecked }
-        }
+    private fun initRV(colleges: MutableList<College>) {
+        val collegeRVAdapter = CollegeRVAdapter(colleges)
+        binding.firstAlarmChoiceCollegeRv.adapter = collegeRVAdapter
+        binding.firstAlarmChoiceCollegeRv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
 
-    private fun getSelectedMajors(): List<String> {
-        return originalCollegeList.flatMap { college ->
-            college.majors.filter { it.isChecked }.map { it.majorName }
+    inner class CollegeRVAdapter(private val colleges: MutableList<CollegesList.College>): RecyclerView.Adapter<CollegeRVAdapter.ViewHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val collegeBinding = ItemAlarmChoiceCollegeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return ViewHolder(collegeBinding)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(colleges[position])
+        }
+
+        override fun getItemCount(): Int = colleges.size
+
+        inner class ViewHolder(private val collegeBinding: ItemAlarmChoiceCollegeBinding): RecyclerView.ViewHolder(collegeBinding.root) {
+            fun bind(college: CollegesList.College) {
+                if (college.enable) {
+                    collegeBinding.itemAlarmChoiceCollegeTitle.text = college.name
+                    initCollege(college)
+                }
+                else {
+                    collegeBinding.root.visibility = View.GONE
+                }
+            }
+
+            fun initCollege(college: CollegesList.College) {
+                val majorRVAdapter = MajorRVAdapter(college)
+                collegeBinding.itemAlarmChoiceCollegeRv.adapter = majorRVAdapter
+                collegeBinding.itemAlarmChoiceCollegeRv.layoutManager = LinearLayoutManager(this@FirstAlarmChoiceActivity, LinearLayoutManager.VERTICAL, false)
+            }
+
+            inner class MajorRVAdapter(private val college: CollegesList.College): RecyclerView.Adapter<MajorRVAdapter.ViewHolder>() {
+                private val majors = college.majors
+
+                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+                    val majorBinding = ItemAlarmChoiceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    return ViewHolder(majorBinding)
+                }
+
+                override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+                    holder.bind(majors[position])
+                }
+
+                override fun getItemCount(): Int = majors.size
+
+                inner class ViewHolder(private val majorBinding: ItemAlarmChoiceBinding): RecyclerView.ViewHolder(majorBinding.root) {
+                    fun bind(major: CollegesList.Major) {
+                        majorBinding.itemAlarmChoiceTitle.text = major.name
+
+                        if (setting.alarmMajor.contains(major.name)) {
+                            majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_on)
+                        } else {
+                            majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_off)
+                        }
+
+                        majorBinding.root.setOnClickListener {
+                            if (setting.alarmMajor.contains(major.name)) {
+                                setting.alarmMajor.remove(major.name)
+                            } else {
+                                if (setting.alarmMajor.size >= 2) {
+                                    setting.alarmMajor = arrayListOf(setting.alarmMajor.get(1))
+                                }
+                                setting.alarmMajor.add(major.name)
+                            }
+
+                            updateNextButtonVisibility()
+                            saveSetting(this@FirstAlarmChoiceActivity, setting)
+
+                            initRV(this@FirstAlarmChoiceActivity.alarmCollegeList)
+                        }
+                    }
+                }
+            }
         }
     }
 }
