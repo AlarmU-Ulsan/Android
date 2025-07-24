@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.uou_alarm_it.databinding.ActivitySplashBinding
@@ -56,27 +57,28 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
                 call: Call<GetVersionResponse>,
                 response: Response<GetVersionResponse>
             ) {
+                Log.d(APP_FLOW_TAG, "버전 API 응답 코드: ${response.code()}")
+
                 if (response.code() == 200 && response.body()?.result != null) {
-                    if (response.body()!!.result.latestVersion <= version) {
-                        // 버전이 최신이면
+                    val serverVersion = response.body()!!.result.latestVersion
+                    Log.d(APP_FLOW_TAG, "서버 최신 버전: $serverVersion")
+
+                    if (serverVersion <= version) {
+                        // 버전 최신일 때
                         intent?.extras?.let {
                             link = it.getString("link") ?: ""
                         }
 
-                        // SharedPreferences를 통해 최초 실행 여부 체크
                         val sharedPref = getSharedPreferences("app_preferences", MODE_PRIVATE)
                         val isFirstRun = sharedPref.getBoolean("isFirstRun", true)
 
-                        // 2초 딜레이 후 다음 액티비티 전환
                         Handler(Looper.getMainLooper()).postDelayed({
                             if (isFirstRun) {
-                                // 최초 실행이면, flag 업데이트 후 FirstNoticeChoiceActivity로 이동
                                 sharedPref.edit().putBoolean("isFirstRun", false).apply()
                                 val intent = Intent(this@SplashActivity, FirstNoticeChoiceActivity::class.java)
                                 intent.putExtra("link", link)
                                 startActivity(intent)
                             } else {
-                                // 최초 실행이 아니면 NoticeActivity로 이동
                                 val intent = Intent(this@SplashActivity, NoticeActivity::class.java)
                                 intent.putExtra("link", link)
                                 startActivity(intent)
@@ -84,22 +86,33 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
                             finish()
                         }, 2000)
                     } else {
-                        // 최신 버전이 아닐 경우, 업데이트 다이얼로그 띄우기
+                        // 업데이트 필요
                         val updateLink = response.body()!!.result.link
-                        val lastVersion = response.body()!!.result.latestVersion
-                        val dialog = UpdateDialog(this@SplashActivity, updateLink, lastVersion, version)
+                        val dialog = UpdateDialog(this@SplashActivity, updateLink, serverVersion, version)
                         dialog.isCancelable = false
                         dialog.show(supportFragmentManager, "UpdateDialog")
                     }
                 } else {
-                    // 네트워크 에러 다이얼로그 처리 등 추가 로직
+                    Log.e(APP_FLOW_TAG, "버전 정보 없음 또는 코드 200 아님")
+                    Toast.makeText(this@SplashActivity, "버전 확인에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    moveToFallbackScreen()
                 }
             }
 
             override fun onFailure(call: Call<GetVersionResponse>, t: Throwable) {
-                // 네트워크 에러 처리 로직
+                Log.e(APP_FLOW_TAG, "버전 API 호출 실패: ${t.message}")
+                Toast.makeText(this@SplashActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                moveToFallbackScreen()
             }
         })
+    }
+
+    private fun moveToFallbackScreen() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            val intent = Intent(this@SplashActivity, NoticeActivity::class.java)
+            startActivity(intent)
+            finish()
+        }, 2000)
     }
 
     override fun onClickYes(url: String) {

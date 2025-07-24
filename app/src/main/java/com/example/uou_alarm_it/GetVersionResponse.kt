@@ -7,7 +7,6 @@ data class GetVersionResponse(
     val result: Result
 ) {
     data class Result(
-        val id: Int,
         val platform: String,
         val latestVersion: String,
         val minimumVersion: String,
