@@ -29,19 +29,20 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
         const val DEVICE_ID_KEY = "device_id"
         const val PREF_NAME = "app_preferences"
         const val APP_FLOW_TAG = "AppFlow"
+        const val PREF_FIRST_RUN_DONE = "first_run_done"
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
+        // 권한 요청 후 → 개인정보 동의
         if (isGranted) {
             Snackbar.make(binding.root, R.string.allowing_notification, Snackbar.LENGTH_SHORT).show()
         } else {
             Snackbar.make(binding.root, R.string.deny_notification, Snackbar.LENGTH_SHORT).show()
         }
 
-        // ✅ 권한 부여 여부와 상관없이 FCM은 계속 진행
-        setFCM(this)
+        showPrivacyPolicyDialog()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,11 +50,8 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 현재 앱 버전 표시
-        val version = packageManager.getPackageInfo(packageName, 0).versionName.toString()
-        binding.splashVersionTv.text = version
-
-        var link = ""
+        val sharedPref = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+        val isFirstRun = !sharedPref.getBoolean(PREF_FIRST_RUN_DONE, false)
 
         // 기기 고유 ID 가져오기 및 저장
         val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
@@ -64,12 +62,79 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
             return
         } else {
             Log.d(APP_FLOW_TAG, "기기 ID: $deviceId")
-            val sharedPref = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
             sharedPref.edit().putString(DEVICE_ID_KEY, deviceId).apply()
         }
 
-        askNotificationPermission()
+        if (isFirstRun) {
+            askNotificationPermission() // 알림 권한 → 개인정보 동의 → setFCM()
+        } else {
+            proceedAfterPrivacyConsent() // 바로 FCM, 개인정보 동의, 버전 체크
+        }
 
+    }
+
+    private fun moveToFallbackScreen() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            val intent = Intent(this@SplashActivity, NoticeActivity::class.java)
+            startActivity(intent)
+            finish()
+        }, 2000)
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    Snackbar.make(binding.root, R.string.allowing_notification, Snackbar.LENGTH_SHORT).show()
+                    showPrivacyPolicyDialog() // ✅ 권한 있으면 바로 다음 단계
+                }
+
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    Snackbar.make(binding.root, R.string.if_allow_notification, Snackbar.LENGTH_SHORT).show()
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                    startActivity(intent)
+                    finish()
+                }
+
+                else -> {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        } else {
+            showPrivacyPolicyDialog()
+        }
+    }
+
+    private fun showPrivacyPolicyDialog() {
+        val dialog = PrivacyPolicyDialog(
+            context = this,
+            onAgree = {
+                // ✅ 최초 실행 처리 완료로 저장
+                val sharedPref = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+                sharedPref.edit().putBoolean(PREF_FIRST_RUN_DONE, true).apply()
+
+                Log.d(APP_FLOW_TAG, "개인정보 수집 동의 완료")
+                proceedAfterPrivacyConsent()
+            },
+            onCancel = {
+                Log.d(APP_FLOW_TAG, "개인정보 수집 동의 거부 - 앱 종료")
+                finish()
+            }
+        )
+        dialog.show()
+    }
+
+    private fun checkAppVersionAndStart() {
+        // 현재 앱 버전 표시
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.toString()
+        binding.splashVersionTv.text = version
+
+        var link = ""
         RetrofitClient.service.getVersion().enqueue(object : Callback<GetVersionResponse> {
             override fun onResponse(
                 call: Call<GetVersionResponse>,
@@ -125,42 +190,12 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
         })
     }
 
-    private fun moveToFallbackScreen() {
-        Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this@SplashActivity, NoticeActivity::class.java)
-            startActivity(intent)
-            finish()
-        }, 2000)
-    }
+    private fun proceedAfterPrivacyConsent() {
+        // ✅ 이 안에서 FCM 이후 흐름 이어가도 됩니다.
+        setFCM(this)
 
-    private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            when {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    Snackbar.make(binding.root, R.string.allowing_notification, Snackbar.LENGTH_SHORT).show()
-                    setFCM(this) // 권한이 이미 있는 경우 FCM 발급
-                }
-
-                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
-                    Snackbar.make(binding.root, R.string.if_allow_notification, Snackbar.LENGTH_SHORT).show()
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.parse("package:$packageName")
-                    }
-                    startActivity(intent)
-                    finish()
-                }
-
-                else -> {
-                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-            }
-        } else {
-            // Android 13 미만은 권한 필요 없음 → 바로 FCM 발급
-            setFCM(this)
-        }
+        // 기존 버전 체크 API 요청 등 이어서 실행
+        checkAppVersionAndStart()
     }
 
     override fun onClickYes(url: String) {

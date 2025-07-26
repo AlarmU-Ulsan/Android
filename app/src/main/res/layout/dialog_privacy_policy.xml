@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="286dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_privacy_plicy">
+
+    <TextView
+        android:id="@+id/privacy_comment_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="알림이U 이용을 위해\n동의가 필요해요"
+        android:textStyle="bold"
+        android:textSize="20.5dp"
+        android:textColor="@color/black"
+        android:letterSpacing="-0.027"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="30dp"/>
+    
+    <ImageView
+        android:id="@+id/privacy_checkbox_iv"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/notice_check_off"
+        app:layout_constraintStart_toStartOf="@id/privacy_comment_tv"
+        app:layout_constraintTop_toBottomOf="@id/privacy_comment_tv"
+        android:layout_marginTop="22dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="개인정보 처리 동의"
+        android:textSize="17dp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="@id/privacy_checkbox_iv"
+        app:layout_constraintBottom_toBottomOf="@id/privacy_checkbox_iv"
+        app:layout_constraintStart_toEndOf="@id/privacy_checkbox_iv"
+        android:layout_marginStart="9dp"/>
+
+    <TextView
+        android:id="@+id/privacy_policy_detail_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[자세히보기]"
+        android:textColor="#878787"
+        android:textSize="12dp"
+        android:letterSpacing="-0.019"
+        app:layout_constraintTop_toTopOf="@id/privacy_checkbox_iv"
+        app:layout_constraintBottom_toBottomOf="@id/privacy_checkbox_iv"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="33dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/privacy_checkbox_iv"
+        android:layout_marginTop="64dp"
+        android:gravity="center"
+        android:paddingBottom="48dp">
+
+        <TextView
+            android:id="@+id/privacy_close_btn_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="닫기"
+            android:textSize="16dp"
+            android:textColor="#666666"
+            android:textStyle="bold"
+            android:background="@drawable/bg_privacy_gray_btn"
+            android:paddingHorizontal="64dp"
+            android:paddingVertical="16dp"/>
+
+        <TextView
+            android:id="@+id/privacy_next_btn_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="다음"
+            android:textStyle="bold"
+            android:textColor="#666666"
+            android:textSize="16dp"
+            android:background="@drawable/bg_privacy_gray_btn"
+            android:paddingHorizontal="64dp"
+            android:paddingVertical="16dp"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
