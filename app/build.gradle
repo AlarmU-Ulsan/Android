@@ -8,7 +8,6 @@ plugins {
 android {
     namespace 'com.example.uou_alarm_it'
     compileSdk 35
-
     viewBinding {
         enabled = true
     }
@@ -16,6 +15,7 @@ android {
     defaultConfig {
         applicationId "com.example.uou_alarm_it"
         minSdk 29
+        targetSdk 33
         versionCode 1
         versionName "1.0.3.1"
 

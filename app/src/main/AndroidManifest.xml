@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UOUAlarmit">
         <activity
+            android:name=".PrivacyPolicyActivity"
+            android:exported="false" />
+        <activity
             android:name=".FirstAlarmChoiceActivity"
             android:exported="false" />
         <activity
@@ -36,7 +39,6 @@
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -44,12 +46,14 @@
             <!-- 딥링크용 -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="https"
                     android:host="alarmitu.app"
-                    android:pathPrefix="/" />
+                    android:pathPrefix="/"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
@@ -61,7 +65,7 @@
             android:exported="false" />
         <activity
             android:name=".AlarmChoiceActivity"
-            android:exported="false"/>
+            android:exported="false" />
     </application>
 
 </manifest>

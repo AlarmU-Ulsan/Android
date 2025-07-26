@@ -42,13 +42,13 @@ object CollegesList {
                 Major("예술학부", true)
             )
         ),
-        College("의과대학",
-            mutableListOf(
-                Major("의예과[의학과]", false), // 서비스 제외(1.0.3.1)
-                Major("간호학과", false) // 서비스 제외(1.0.3.1)
-            ),
-            false // 의과대학 전체 전공 서비스 제외(1.0.3.1)
-        ),
+//        College("의과대학",
+//            mutableListOf(
+//                Major("의예과[의학과]", false), // 서비스 제외(1.0.3.1)
+//                Major("간호학과", false) // 서비스 제외(1.0.3.1)
+//            ),
+//            false // 의과대학 전체 전공 서비스 제외(1.0.3.1)
+//        ),
         College("아산아너스칼리지",
             mutableListOf(
                 Major("자율전공학부", true)
