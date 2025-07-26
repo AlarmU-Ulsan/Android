@@ -1,20 +1,26 @@
 package com.example.uou_alarm_it
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.uou_alarm_it.databinding.ActivitySplashBinding
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.BuildConfig
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.Manifest
 
 class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterface {
     private lateinit var binding: ActivitySplashBinding
@@ -23,6 +29,19 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
         const val DEVICE_ID_KEY = "device_id"
         const val PREF_NAME = "app_preferences"
         const val APP_FLOW_TAG = "AppFlow"
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Snackbar.make(binding.root, R.string.allowing_notification, Snackbar.LENGTH_SHORT).show()
+        } else {
+            Snackbar.make(binding.root, R.string.deny_notification, Snackbar.LENGTH_SHORT).show()
+        }
+
+        // ✅ 권한 부여 여부와 상관없이 FCM은 계속 진행
+        setFCM(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +68,7 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
             sharedPref.edit().putString(DEVICE_ID_KEY, deviceId).apply()
         }
 
-        // ✅ FCM 토큰 발급 및 서버 전송
-        setFCM(this)
+        askNotificationPermission()
 
         RetrofitClient.service.getVersion().enqueue(object : Callback<GetVersionResponse> {
             override fun onResponse(
@@ -113,6 +131,36 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
             startActivity(intent)
             finish()
         }, 2000)
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    Snackbar.make(binding.root, R.string.allowing_notification, Snackbar.LENGTH_SHORT).show()
+                    setFCM(this) // 권한이 이미 있는 경우 FCM 발급
+                }
+
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    Snackbar.make(binding.root, R.string.if_allow_notification, Snackbar.LENGTH_SHORT).show()
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                    startActivity(intent)
+                    finish()
+                }
+
+                else -> {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        } else {
+            // Android 13 미만은 권한 필요 없음 → 바로 FCM 발급
+            setFCM(this)
+        }
     }
 
     override fun onClickYes(url: String) {

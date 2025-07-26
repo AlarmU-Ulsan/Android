@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">알림이U</string>
+
+    <string name="allowing_notification">알림 권한이 허용되었습니다</string>
+    <string name="deny_notification">알림 권한이 거부되었습니다</string>
+    <string name="if_allow_notification">알림을 사용하려면 설정에서 권한을 허용해주세요</string>
+
 </resources>
