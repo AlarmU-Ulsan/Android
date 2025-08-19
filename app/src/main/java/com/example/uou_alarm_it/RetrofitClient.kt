@@ -5,25 +5,30 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.CookieManager
+import com.example.uou_alarm_it.BuildConfig
 
 class RetrofitClient {
 
     companion object {
-        const val BASE_URL = "https://alarm-it.ulsan.ac.kr:6004" // url
 
-        var builder = OkHttpClient().newBuilder()
-        var okHttpClient = builder
-            .cookieJar(JavaNetCookieJar(CookieManager()))
-            .build()
+        // Retrofit baseUrl은 반드시 슬래시로 끝나야 합니다.
+        private fun ensureSlash(url: String) =
+            if (url.endsWith("/")) url else "$url/"
 
+        private val okHttpClient: OkHttpClient by lazy {
+            OkHttpClient.Builder()
+                .cookieJar(JavaNetCookieJar(CookieManager()))
+                .build()
+        }
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        private val retrofit: Retrofit by lazy {
+            Retrofit.Builder()
+                .baseUrl(ensureSlash(BuildConfig.BASE_URL)) // ✅ 빌드 시 주입된 값 사용
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+        }
 
-        val service: RetrofitService = retrofit.create(RetrofitService::class.java)
+        val service: RetrofitService by lazy { retrofit.create(RetrofitService::class.java) }
     }
-
 }

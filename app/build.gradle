@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
@@ -12,6 +14,19 @@ android {
         enabled = true
     }
 
+    def loadApiBaseUrl = {
+        def props = new Properties()
+        def f = rootProject.file("local.properties")
+        if (f.exists()) { f.withInputStream { props.load(it) } }
+
+        def v = props.getProperty("ALARMIT_API_URL",
+                project.findProperty("ALARMIT_API_URL") ?: System.getenv("ALARMIT_API_URL"))
+
+        if (v == null || v.trim().isEmpty()) v = "http://10.0.2.2:8080/"
+        return v.endsWith("/") ? v : (v + "/")
+    }
+    def API_BASE_URL = loadApiBaseUrl()
+
     defaultConfig {
         applicationId "com.example.uou_alarm_it"
         minSdk 29
@@ -20,6 +35,8 @@ android {
         versionName "1.0.3.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField 'String', 'BASE_URL', "\"${API_BASE_URL}\""
     }
 
     buildTypes {
@@ -34,6 +51,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 }
 
