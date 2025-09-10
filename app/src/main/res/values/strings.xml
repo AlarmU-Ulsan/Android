@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">알림이U</string>
+    <string name="app_name">알림IT</string>
 
     <string name="allowing_notification">알림 권한이 허용되었습니다</string>
     <string name="deny_notification">알림 권한이 거부되었습니다</string>
