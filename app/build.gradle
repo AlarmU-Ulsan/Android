@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.uou_alarm_it'
+    namespace 'com.alarmit.uou_alarm_it'
     compileSdk 35
     viewBinding {
         enabled = true
