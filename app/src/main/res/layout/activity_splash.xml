@@ -24,7 +24,7 @@
             android:id="@+id/splash_app_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="알림이 U"
+            android:text="알림IT"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
