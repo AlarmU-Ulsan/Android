@@ -28,7 +28,7 @@ android {
     def API_BASE_URL = loadApiBaseUrl()
 
     defaultConfig {
-        applicationId "com.example.uou_alarm_it"
+        applicationId "com.alarmit.uou_alarm_it"
         minSdk 29
         targetSdk 33
         versionCode 1
