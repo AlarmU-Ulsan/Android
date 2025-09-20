@@ -71,25 +71,46 @@ interface SettingInterface{
         var token = ""
         var setting = loadSetting(context)
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM/SettingInterface", "FCM 토큰 가져오기 실패", task.exception)
-                return@addOnCompleteListener
-            } else {
-                token = task.result.toString()
-                Log.d("FCM/SettingInterface", "FCM 토큰: $token")
+        if(setting.alarmSetting){
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("FCM/SettingInterface", "FCM 토큰 가져오기 실패", task.exception)
+                    return@addOnCompleteListener
+                } else {
+                    token = task.result.toString()
+                    Log.d("FCM/SettingInterface", "FCM 토큰: $token")
 
-                if (setting.alarmSetting) { // 알림이 켜져있을 경우에만 FCM 연결
                     postFCM(setting.deviceId, token)
                     setting.FCM = true
                     saveSetting(context, setting)
                     Log.d("FCM/SettingInterface", "알림 연결 완료")
                 }
-                else {
-                    Log.d("FCM/SettingInterface", "알림 꺼짐")
+            }
+        } else {
+            deleteFCM(setting.deviceId)
+            setting.FCM = false
+            saveSetting(context, setting)
+            Log.d("FCM/SettingInterface", "알림 해제 완료")
+        }
+    }
+
+    fun deleteFCM(deviceId: String){
+        RetrofitClient.service.deleteFCMToken(deviceId).enqueue(object : Callback<PostFCMResponse> {
+            override fun onResponse(
+                call: Call<PostFCMResponse>,
+                response: Response<PostFCMResponse>
+            ) {
+                if (response.isSuccessful && response.body()?.isSuccess == true) {
+                    Log.d("FCM/SettingInterface", "FCM 해제 성공: ${response.body()?.message}")
+                } else {
+                    Log.e("FCM/SettingInterface", "FCM 해제 실패: ${response.errorBody()?.string()}")
                 }
             }
-        }
+
+            override fun onFailure(call: Call<PostFCMResponse>, t: Throwable) {
+                Log.e("FCM/SettingInterface", "FCM 해제 실패: ${t.message}")
+            }
+        })
     }
 
     fun postFCMSub(deviceId: String, major: String) {
