@@ -128,18 +128,16 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                         majorBinding.itemAlarmChoiceTitle.text = major.name
 
                         if (setting.alarmMajor.contains(major.name)) {
-                            majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_on)
+                            majorBinding.itemAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_on)
                         } else {
-                            majorBinding.itmeAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_off)
+                            majorBinding.itemAlarmChoiceToggle.setImageResource(R.drawable.alarm_check_off)
                         }
 
-                        majorBinding.root.setOnClickListener {
+                        majorBinding.itemAlarmChoiceToggle.setOnClickListener {
                             if (setting.alarmMajor.contains(major.name)) {
                                 setting.alarmMajor.remove(major.name)
                             } else {
-                                if (setting.alarmMajor.size >= 2) {
-                                    setting.alarmMajor = arrayListOf(setting.alarmMajor.get(1))
-                                }
+                                setting.alarmMajor.clear()
                                 setting.alarmMajor.add(major.name)
                             }
 
