@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <ImageView
-        android:id="@+id/itme_alarm_choice_toggle"
+        android:id="@+id/item_alarm_choice_toggle"
         android:layout_width="25dp"
         android:layout_height="31dp"
         android:src="@drawable/alarm_check_off"
