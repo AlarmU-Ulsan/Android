@@ -1,5 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+    ext {
+        BASE_URL_TEST = 'https://alarm-it.ulsan.ac.kr/test'
+        BASE_URL = 'https://alarm-it.ulsan.ac.kr'
+    }
     repositories {
 
     }

@@ -24,9 +24,9 @@ interface RetrofitService {
         @Body request: PostFCMTokenRequest
     ): Call<PostFCMResponse>
 
-    @DELETE("/fcm/fcm_token")
+    @HTTP(method = "DELETE", path = "/fcm/fcm_token", hasBody = true)
     fun deleteFCMToken(
-        @Query("deviceId") deviceId: String
+        @Body request: DeleteFCMTokenRequest
     ): Call<PostFCMResponse>
 
     @POST("/fcm/subscribe")

@@ -94,12 +94,10 @@ interface SettingInterface{
         }
     }
 
-    fun deleteFCM(deviceId: String){
-        RetrofitClient.service.deleteFCMToken(deviceId).enqueue(object : Callback<PostFCMResponse> {
-            override fun onResponse(
-                call: Call<PostFCMResponse>,
-                response: Response<PostFCMResponse>
-            ) {
+    fun deleteFCM(deviceId: String) {
+        val request = DeleteFCMTokenRequest(deviceId)
+        RetrofitClient.service.deleteFCMToken(request).enqueue(object : Callback<PostFCMResponse> {
+            override fun onResponse(call: Call<PostFCMResponse>, response: Response<PostFCMResponse>) {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                     Log.d("FCM/SettingInterface", "FCM 해제 성공: ${response.body()?.message}")
                 } else {
