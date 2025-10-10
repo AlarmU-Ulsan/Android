@@ -22,7 +22,6 @@ android {
         def v = props.getProperty("ALARMIT_API_URL",
                 project.findProperty("ALARMIT_API_URL") ?: System.getenv("ALARMIT_API_URL"))
 
-        if (v == null || v.trim().isEmpty()) v = "http://10.0.2.2:8080/"
         return v.endsWith("/") ? v : (v + "/")
     }
     def API_BASE_URL = loadApiBaseUrl()
@@ -39,11 +38,11 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField 'String', 'BASE_URL', "\"${BASE_URL_TEST}\""
+            buildConfigField 'String', 'BASE_URL', "\"${BASE_URL}\""
         }
 
         release {
-            buildConfigField 'String', 'BASE_URL', "\"${BASE_URL}\""
+            buildConfigField 'String', 'BASE_URL', "\"${BASE_URL_TEST}\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

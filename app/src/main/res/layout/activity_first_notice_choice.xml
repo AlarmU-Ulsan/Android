@@ -11,7 +11,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="30dp">
+        android:paddingHorizontal="30dp"
+        android:paddingBottom="30dp">
         
         <TextView
             android:id="@+id/first_notice_title_tv"

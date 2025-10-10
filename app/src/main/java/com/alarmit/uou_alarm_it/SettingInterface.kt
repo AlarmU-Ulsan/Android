@@ -20,7 +20,7 @@ interface SettingInterface{
         return if (json != null) {
             gson.fromJson(json, Setting::class.java)
         } else {
-            Setting(deviceId!!,"ICT융합학부",true, arrayListOf(), false)
+            Setting(deviceId!!,"ICT융합학부",true, "", false)
         }
     }
 
@@ -81,6 +81,7 @@ interface SettingInterface{
                     Log.d("FCM/SettingInterface", "FCM 토큰: $token")
 
                     postFCM(setting.deviceId, token)
+                    postFCMSub(setting.deviceId, setting.alarmMajor.toString())
                     setting.FCM = true
                     saveSetting(context, setting)
                     Log.d("FCM/SettingInterface", "알림 연결 완료")
@@ -88,6 +89,7 @@ interface SettingInterface{
             }
         } else {
             deleteFCM(setting.deviceId)
+            deleteFCMSub(setting.deviceId, setting.alarmMajor.toString())
             setting.FCM = false
             saveSetting(context, setting)
             Log.d("FCM/SettingInterface", "알림 해제 완료")
@@ -123,6 +125,7 @@ interface SettingInterface{
                 call: Call<PostFCMSubscribeResponse>,
                 response: Response<PostFCMSubscribeResponse>
             ) {
+                Log.d("FCM/SettingInterface", "FCM 전공 연결 request: "+ request.deviceId + "," + request.major)
                 Log.d("FCM/SettingInterface", "FCM 전공 연결 성공: " + response.body()?.code.toString())
             }
             override fun onFailure(call: Call<PostFCMSubscribeResponse>, t: Throwable) {
@@ -149,29 +152,6 @@ interface SettingInterface{
                 Log.e("FCM/SettingInterface", "FCM 전공 연결 해제 실패: " + t)
             }
         })
-    }
-
-
-    fun changeMajor(context: Context, majors: List<String>) {
-        val setting = loadSetting(context)
-        val post_majors = setting.alarmMajor.toList()
-
-        for(major in post_majors) {
-            // 원래 데이터에 있는 게 최신 데이터에 없다면 -> 삭제
-            if (!majors.contains(major)) {
-                deleteFCMSub(setting.deviceId, major)
-                setting.alarmMajor.remove(major)
-            }
-        }
-        for (major in majors) {
-            // 원래 데이터에 없던 게 생겼다면 -> 추가
-            if (!post_majors.contains(major)) {
-                postFCMSub(setting.deviceId, major)
-                setting.alarmMajor.add(major)
-            }
-        }
-
-        saveSetting(context, setting)
     }
 
 }

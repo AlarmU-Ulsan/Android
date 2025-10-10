@@ -3,6 +3,7 @@ package com.alarmit.uou_alarm_it
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -134,15 +135,14 @@ class AlarmChoiceActivity: AppCompatActivity(), SettingInterface {
                         }
 
                         majorBinding.itemAlarmChoiceToggle.setOnClickListener {
-                            if (setting.alarmMajor.contains(major.name)) {
-                                setting.alarmMajor.remove(major.name)
+                            if (setting.alarmMajor == major.name) {
+                                setting.alarmMajor = "" // 선택 해제
                             } else {
-                                setting.alarmMajor.clear()
-                                setting.alarmMajor.add(major.name)
+                                setting.alarmMajor = major.name
+                                Log.d("alarm_setting", "알람 전공 선택: ${major.name}")
                             }
 
                             saveSetting(this@AlarmChoiceActivity, setting)
-
                             initRV(this@AlarmChoiceActivity.alarmCollegeList)
                         }
                     }

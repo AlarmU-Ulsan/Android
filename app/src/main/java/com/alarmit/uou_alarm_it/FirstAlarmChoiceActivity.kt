@@ -44,6 +44,7 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
         }
 
         binding.firstAlarmNextBtnTv.setOnClickListener {
+
             val sharedPref = getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
             sharedPref.edit().putBoolean("isInitialFlowComplete", true).apply()
             val intent = Intent(this, NoticeActivity::class.java)
@@ -75,8 +76,8 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
     }
 
     private fun updateNextButtonVisibility() {
-        val selectedCount = setting.alarmMajor.size
-        binding.firstAlarmNextBtnTv.text = if (selectedCount > 0) "완료" else "건너뛰기"
+        val hasSelection = setting.alarmMajor.isNotEmpty()
+        binding.firstAlarmNextBtnTv.text = if (hasSelection) "완료" else "건너뛰기"
 
         if (binding.firstAlarmNextBtnTv.visibility != View.VISIBLE) {
             binding.firstAlarmNextBtnTv.visibility = View.VISIBLE
@@ -146,16 +147,14 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
                         }
 
                         majorBinding.root.setOnClickListener {
-                            if (setting.alarmMajor.contains(major.name)) {
-                                setting.alarmMajor.remove(major.name)
+                            if (setting.alarmMajor == major.name) {
+                                setting.alarmMajor = "" // 선택 해제
                             } else {
-                                setting.alarmMajor.clear()
-                                setting.alarmMajor.add(major.name)
+                                setting.alarmMajor = major.name
                             }
 
                             updateNextButtonVisibility()
                             saveSetting(this@FirstAlarmChoiceActivity, setting)
-
                             initRV(this@FirstAlarmChoiceActivity.alarmCollegeList)
                         }
                     }

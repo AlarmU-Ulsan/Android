@@ -2,7 +2,7 @@ package com.alarmit.uou_alarm_it
 
 data class PostFCMSubscribeResponse(
     val isSuccess: Boolean,
-    val code: String,
+    val code: Int,
     val message: String,
     val result: Result
 ) {
