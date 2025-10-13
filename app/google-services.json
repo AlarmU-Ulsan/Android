@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:398280503958:android:45ceef1f81f8aa807a88b7",
+        "mobilesdk_app_id": "1:398280503958:android:e8de57fbc0fcb7d17a88b7",
         "android_client_info": {
-          "package_name": "com.alarmit.uou_alarm_it"
+          "package_name": "com.alarmit.alarm_it"
         }
       },
       "oauth_client": [],
