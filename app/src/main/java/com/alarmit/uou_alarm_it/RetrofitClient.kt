@@ -21,8 +21,9 @@ class RetrofitClient {
         }
 
         private val retrofit: Retrofit by lazy {
+            val baseUrl = BuildConfig.BASE_URL
             Retrofit.Builder()
-                .baseUrl("https://alarm-it.ulsan.ac.kr/test/") // ✅ 빌드 시 주입된 값 사용
+                .baseUrl(if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/") // ✅ 빌드 시 주입된 값 사용
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

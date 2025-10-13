@@ -14,35 +14,40 @@ android {
         enabled = true
     }
 
-    def loadApiBaseUrl = {
-        def props = new Properties()
-        def f = rootProject.file("local.properties")
-        if (f.exists()) { f.withInputStream { props.load(it) } }
-
-        def v = props.getProperty("ALARMIT_API_URL",
-                project.findProperty("ALARMIT_API_URL") ?: System.getenv("ALARMIT_API_URL"))
-
-        return v.endsWith("/") ? v : (v + "/")
+    // 🔹 local.properties에서 URL 읽기
+    def props = new Properties()
+    def localPropsFile = rootProject.file("local.properties")
+    if (localPropsFile.exists()) {
+        localPropsFile.withInputStream { props.load(it) }
     }
-    def API_BASE_URL = loadApiBaseUrl()
+
+    def BASE_URL_TEST = props.getProperty("BASE_URL_TEST")
+    def BASE_URL_PROD = props.getProperty("BASE_URL_PROD")
+
+    if (!BASE_URL_TEST || !BASE_URL_PROD) {
+        throw new GradleException("❌ local.properties에 BASE_URL_TEST 또는 BASE_URL_PROD가 정의되어 있지 않습니다.")
+    }
 
     defaultConfig {
         applicationId "com.alarmit.uou_alarm_it"
         minSdk 29
         targetSdk 35
         versionCode 1
-        versionName "1.0.3.1"
+        versionName "1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         debug {
-            buildConfigField 'String', 'BASE_URL', "\"${BASE_URL}\""
+            // ✅ 테스트 서버 URL
+            buildConfigField "String", "BASE_URL", "\"${BASE_URL_TEST}\""
+            versionNameSuffix "-debug"
         }
 
         release {
-            buildConfigField 'String', 'BASE_URL', "\"${BASE_URL_TEST}\""
+            // ✅ 운영 서버 URL
+            buildConfigField "String", "BASE_URL", "\"${BASE_URL_PROD}\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
