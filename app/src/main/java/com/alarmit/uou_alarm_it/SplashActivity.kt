@@ -130,7 +130,10 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
 
     private fun checkAppVersionAndStart() {
         // 현재 앱 버전 표시
-        val version = packageManager.getPackageInfo(packageName, 0).versionName.toString()
+//        val version = packageManager.getPackageInfo(packageName, 0).versionName.toString()
+//        binding.splashVersionTv.text = version
+
+        val version = BuildConfig.VERSION_NAME
         binding.splashVersionTv.text = version
 
         var link = ""
@@ -144,6 +147,8 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
                 if (response.code() == 200 && response.body()?.result != null) {
                     val serverVersion = response.body()!!.result.latestVersion
                     Log.d(APP_FLOW_TAG, "서버 최신 버전: $serverVersion")
+
+                    binding.splashVersionTv.text = serverVersion
 
                     if (serverVersion <= version) {
                         // 버전 최신일 때
