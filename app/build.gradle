@@ -29,7 +29,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.alarmit.uou_alarm_it"
+        applicationId "com.alarmit.alarm_it"
         minSdk 29
         targetSdk 35
         versionCode 1
