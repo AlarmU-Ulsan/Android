@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace 'com.alarmit.alarm_it'
+    namespace 'com.uou.alarmit'
     compileSdk 35
     viewBinding {
         enabled = true
@@ -29,7 +29,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.alarmit.alarm_it"
+        applicationId "com.uou.alarmit"
         minSdk 29
         targetSdk 35
         versionCode 1
@@ -100,4 +100,7 @@ dependencies {
 
     // FCM
     implementation 'com.google.firebase:firebase-messaging-ktx:23.0.0'
+
+    implementation platform('com.google.firebase:firebase-bom:34.8.0')
+    implementation 'com.google.firebase:firebase-analytics'
 }

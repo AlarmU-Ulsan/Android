@@ -1,0 +1,18 @@
+package com.uou.alarmit
+
+data class PostFCMSubscribeResponse(
+    val isSuccess: Boolean,
+    val code: String,
+    val message: String,
+    val result: Result
+) {
+    data class Result(
+        val deviceId: String,
+        val token: String,
+        val subscribeMajors: List<SubscribeMajor>
+    ) {
+        data class SubscribeMajor(
+            val id: Int
+        )
+    }
+}
