@@ -147,6 +147,7 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
                         }
 
                         majorBinding.root.setOnClickListener {
+                            val previousMajor = setting.alarmMajor
                             if (setting.alarmMajor == major.name) {
                                 setting.alarmMajor = "" // 선택 해제
                             } else {
@@ -155,6 +156,7 @@ class FirstAlarmChoiceActivity : AppCompatActivity(), SettingInterface {
 
                             updateNextButtonVisibility()
                             saveSetting(this@FirstAlarmChoiceActivity, setting)
+                            syncAlarmSubscription(this@FirstAlarmChoiceActivity, previousMajor, setting.alarmMajor)
                             initRV(this@FirstAlarmChoiceActivity.alarmCollegeList)
                         }
                     }

@@ -203,7 +203,13 @@ class SplashActivity : AppCompatActivity(), UpdateDialogInterface, SettingInterf
     }
 
     override fun onClickYes(url: String) {
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val safeUrl = UrlSecurity.normalizeSafeUrl(url)
+        if (safeUrl == null) {
+            Toast.makeText(this, "안전하지 않은 업데이트 링크입니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(safeUrl))
         startActivity(browserIntent)
         ActivityCompat.finishAffinity(this)
         System.exit(0)
