@@ -21,7 +21,7 @@ android {
         localPropsFile.withInputStream { props.load(it) }
     }
 
-    def BASE_URL_TEST = props.getProperty("BASE_URL_TEST")
+    def BASE_URL_TEST = props.getProperty("BASE_URL_PROD")
     def BASE_URL_PROD = props.getProperty("BASE_URL_PROD")
 
     if (!BASE_URL_TEST || !BASE_URL_PROD) {
@@ -32,8 +32,8 @@ android {
         applicationId "com.uou.alarmit"
         minSdk 29
         targetSdk 35
-        versionCode 1
-        versionName "1.0.3"
+        versionCode 3
+        versionName "1.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,7 +41,7 @@ android {
     buildTypes {
         debug {
             // ✅ 테스트 서버 URL
-            buildConfigField "String", "BASE_URL", "\"${BASE_URL_TEST}\""
+            buildConfigField "String", "BASE_URL", "\"${BASE_URL_PROD}\""
             versionNameSuffix "-debug"
         }
 
