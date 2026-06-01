@@ -58,7 +58,7 @@
         </activity>
         <activity
             android:name=".NoticeActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".WebActivity"
