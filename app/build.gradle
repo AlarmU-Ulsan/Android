@@ -21,7 +21,7 @@ android {
         localPropsFile.withInputStream { props.load(it) }
     }
 
-    def BASE_URL_TEST = props.getProperty("BASE_URL_PROD")
+    def BASE_URL_TEST = props.getProperty("BASE_URL_TEST")
     def BASE_URL_PROD = props.getProperty("BASE_URL_PROD")
 
     if (!BASE_URL_TEST || !BASE_URL_PROD) {
@@ -32,8 +32,8 @@ android {
         applicationId "com.uou.alarmit"
         minSdk 29
         targetSdk 35
-        versionCode 4
-        versionName "1.0.4"
+        versionCode 5
+        versionName "1.0.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
