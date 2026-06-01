@@ -5,6 +5,7 @@ import android.net.Uri
 object UrlSecurity {
     private val allowedHosts = setOf(
         "alarmitu.app",
+        "uou.alarm.it.kr",
         "alarm-it.ulsan.ac.kr",
         "ulsan.ac.kr",
         "www.ulsan.ac.kr",
