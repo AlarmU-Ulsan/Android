@@ -20,7 +20,7 @@ object CollegesList {
                 Major("에너지화학공학부", false), // 서비스 제외(1.0.3.1)
                 Major("신소재·반도체융합학부", true),
                 Major("전기전자융합학부", true),
-                Major("바이오매디컬헬스학부", false) // 서비스 제외(1.0.3.1)
+                Major("바이오매디컬헬스학부", true) // 서비스 추가 (1.0.4)
             )
         ),
         College("스마트도시융합대학",

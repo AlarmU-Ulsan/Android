@@ -21,7 +21,7 @@ class MajorActivity : AppCompatActivity() {
 //            Major("에너지화학공학부"),
             Major("신소재·반도체융합학부"),
             Major("전기전자융합학부"),
-//            Major("바이오매디컬헬스학부")
+            Major("바이오매디컬헬스학부")
         )),
         College("스마트도시융합대학", mutableListOf(
             Major("건축·도시환경학부"),
